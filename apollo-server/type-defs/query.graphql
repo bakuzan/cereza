@@ -1,0 +1,13 @@
+"Included scalars"
+scalar JSON
+
+type Query {
+  "Test query with a parameter"
+  hello(name: String): String!
+
+  "Fetch machine disks"
+  disks: [Disk]!
+
+  "Fetch directory contents"
+  directory(path: String!): DirectoryResponse
+}

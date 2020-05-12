@@ -1,0 +1,19 @@
+type Disk {
+  name: String
+  path: String
+}
+
+type DirectoryEntry {
+  name: String
+  path: String
+  parentName: String
+  isDirectory: Boolean
+  isFile: Boolean
+  isImage: Boolean
+  isVideo: Boolean
+}
+
+type DirectoryResponse {
+  entries: [DirectoryEntry]!
+  canGallery: Boolean
+}
