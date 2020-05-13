@@ -1,5 +1,5 @@
-import { CRZContext } from '../interfaces/CRZContext';
-import { DirectoryArgs } from '../interfaces/DirectoryArgs';
+import { CRZContext } from '@i/CRZContext';
+import { DirectoryArgs } from '@i/DirectoryArgs';
 
 export default {
   Query: {
@@ -7,8 +7,14 @@ export default {
       const entries = await context.readDirectory(args.path);
 
       return {
-        entries,
-        canGallery: entries.every((x) => x.isImage)
+        canGallery: entries.every((x) => x.isImage),
+        entries: entries.sort((a, b) =>
+          a.isDirectory !== b.isDirectory
+            ? b.isDirectory
+              ? 1
+              : -1
+            : a.name.localeCompare(b.name)
+        )
       };
     }
   }

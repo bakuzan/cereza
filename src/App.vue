@@ -34,13 +34,23 @@ export default class App extends Vue {}
   --font-size: 16px;
 
   --header-height: 50px;
+
   --highlight-one: #a32822;
+  --highlight-one-offset: #{lighten(#a32822, 10%)};
   --highlight-two: #5f90e6;
+  --highlight-two-offset: #{lighten(#5f90e6, 10%)};
   --highlight-three: #7b0fc7;
+  --highlight-three-offset: #{lighten(#7b0fc7, 10%)};
 
   --base-colour: #0d0804;
   --contrast-colour: #f1f1f1;
+
   --accent-colour: var(--highlight-one);
+  --accent-colour--hover: var(--highlight-one-offset);
+  --accent-contrast: #fff;
+
+  --danger-colour: red;
+  --disabled-colour: #cccccc;
 }
 
 html,
@@ -62,15 +72,39 @@ button {
 }
 
 main {
-  min-height: calc(100vh - var(--header-height));
-  padding-top: var(--header-height);
+  min-height: calc(100vh - var(--header-height) - 5px);
+  padding: 5px;
+  padding-top: calc(var(--header-height) + 5px);
   overflow-x: hidden;
+}
+
+a {
+  color: var(--accent-colour);
+
+  &:focus,
+  &:hover,
+  &:active {
+    color: var(--accent-colour--hover);
+  }
 }
 
 // General helpers...
 .flex-spacer {
   display: flex;
   flex: 1;
+}
+
+.page {
+  &__title {
+    font-size: 1.3rem;
+    margin: 10px 0;
+  }
+}
+
+.grid {
+  display: grid;
+  padding: 0;
+  list-style-type: none;
 }
 </style>
 
@@ -90,6 +124,10 @@ $padding: 5px;
 
   &__link {
     color: var(--contrast-colour);
+
+    &.router-link-exact-active {
+      color: var(--accent-colour);
+    }
   }
 }
 

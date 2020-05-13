@@ -4,15 +4,16 @@
   "description": "Local directory browser",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "npm run lint && vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
+    "lint": "vue-cli-service lint --fix",
     "apollo": "vue-cli-service apollo:dev --generate-schema",
     "apollo:schema:generate": "vue-cli-service apollo:schema:generate",
     "apollo:schema:publish": "vue-cli-service apollo:schema:publish",
     "apollo:start": "vue-cli-service apollo:start"
   },
   "dependencies": {
+    "classnames": "^2.2.6",
     "core-js": "^3.6.4",
     "graphql-type-json": "^0.2.1",
     "image-extensions": "^1.1.0",

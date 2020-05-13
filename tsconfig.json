@@ -14,11 +14,13 @@
     "types": ["webpack-env", "vue-cli-plugin-apollo/types", "vue-apollo/types"],
     "paths": {
       "@/*": ["src/*"],
+      "@i/*": ["interfaces/*"],
       "#/*": ["apollo-server/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   "include": [
+    "interfaces/**/*.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",

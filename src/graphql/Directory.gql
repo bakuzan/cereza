@@ -1,0 +1,13 @@
+query Directory($path: String!) {
+  directory(path: $path) {
+    canGallery
+    entries {
+      name
+      path
+      isDirectory
+      isFile
+      isImage
+      isVideo
+    }
+  }
+}

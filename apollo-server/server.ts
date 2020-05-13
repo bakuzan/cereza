@@ -1,3 +1,4 @@
+import './type-defs';
 import path from 'path';
 import express from 'express';
 

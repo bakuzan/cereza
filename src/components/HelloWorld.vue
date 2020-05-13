@@ -1,6 +1,9 @@
 <template>
   <div class="hello">
-    <ApolloQuery :query="require('../graphql/HelloWorld.gql')" :variables="{ name: msg }">
+    <ApolloQuery
+      :query="require('../graphql/HelloWorld.gql')"
+      :variables="{ name: msg }"
+    >
       <template slot-scope="{ result: { loading, error, data } }">
         <!-- Loading -->
         <div v-if="loading" class="loading apollo">Loading...</div>
@@ -23,10 +26,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class HelloWorld extends Vue {
-  @Prop() private msg!: string;
+  @Prop() readonly msg!: string;
 }
 </script>
 
-
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

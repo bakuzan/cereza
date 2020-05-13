@@ -1,0 +1,6 @@
+query Disks {
+  disks {
+    name
+    path
+  }
+}

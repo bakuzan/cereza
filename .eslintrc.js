@@ -20,8 +20,9 @@ module.exports = {
   rules: {
     'no-console': 'off',
     'no-debugger': 'off',
+    '@typescript-eslint/no-empty-interface': 'off',
     'graphql/template-strings': [
-      'error',
+      'warn',
       {
         env: 'literal',
         projectName: 'app',

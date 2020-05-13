@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Vue from 'vue';
 import VueApollo from 'vue-apollo';
 import { ApolloClient } from 'apollo-client';
