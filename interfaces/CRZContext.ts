@@ -1,5 +1,6 @@
 import { DirectoryEntry } from './DirectoryEntry';
 
 export interface CRZContext {
-  readDirectory(path: string): Promise<Array<DirectoryEntry>>;
+  isFile(location: string): Promise<boolean>;
+  readDirectory(location: string): Promise<Array<DirectoryEntry>>;
 }

@@ -1,0 +1,6 @@
+query FileAction($path: String!) {
+  fileAction(path: $path) {
+    success
+    errorMessages
+  }
+}

@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 
-import { DirectoryEntry } from '@i/DirectoryEntry';
+import { DirectoryEntry } from '../../interfaces/DirectoryEntry';
 import { isImage, isVideo } from './checkFileType';
 
 const readdir = promisify(fs.readdir);
@@ -10,7 +10,7 @@ const readdir = promisify(fs.readdir);
 export default async function readDirectory(
   directoryPath: string
 ): Promise<DirectoryEntry[]> {
-  const systemPath = path.resolve(directoryPath);
+  const systemPath = path.resolve(path.join(directoryPath, '\\'));
 
   const items = await readdir(systemPath, {
     encoding: 'utf-8',

@@ -1,7 +1,9 @@
 <template>
   <div class="app">
     <nav class="app-header">
-      <h1 class="app-title">Cereza</h1>
+      <h1 class="app-title">
+        <router-link class="app-title__link" to="/">Cereza</router-link>
+      </h1>
       <div class="flex-spacer"></div>
       <router-link class="app-header__link" to="/">Home</router-link>|
       <router-link class="app-header__link" to="/about">About</router-link>
@@ -98,6 +100,7 @@ a {
   &__title {
     font-size: 1.3rem;
     margin: 10px 0;
+    margin-right: 10px;
   }
 }
 
@@ -133,5 +136,11 @@ $padding: 5px;
 
 .app-title {
   margin: 0 5px;
+
+  &__link,
+  &__link:hover {
+    text-decoration: none;
+    color: inherit;
+  }
 }
 </style>

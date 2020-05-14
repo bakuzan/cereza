@@ -86,5 +86,10 @@ export default class Button extends Vue {
   &:active {
     color: var(--accent-colour--hover);
   }
+
+  &:disabled {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 </style>

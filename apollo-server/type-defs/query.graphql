@@ -10,4 +10,7 @@ type Query {
 
   "Fetch directory contents"
   directory(path: String!): DirectoryResponse
+
+  "Activate file default action"
+  fileAction(path: String!): ConfirmationResponse
 }

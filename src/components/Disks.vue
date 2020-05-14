@@ -4,11 +4,19 @@
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
 
-        <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch disks." />
+        <ErrorBlock
+          v-else-if="error"
+          :data="error"
+          message="Failed to fetch disks."
+        />
 
         <div v-else-if="data" class="result apollo">
           <ul class="grid disks">
-            <li v-for="item of data.disks" :key="item.path" class="disks__entry">
+            <li
+              v-for="item of data.disks"
+              :key="item.path"
+              class="disks__entry"
+            >
               <Button class="disk-button" @click="onSelect(item)">
                 <DiskIcon />
                 <div class="disks__name">{{ item.name }}</div>

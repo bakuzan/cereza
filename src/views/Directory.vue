@@ -2,16 +2,7 @@
   <div class="page directory">
     <div class="directory__header">
       <h2 class="page__title">Directory</h2>
-      <div class="crumbs">
-        <Button
-          v-for="(crumb, index) of directoryCrumbs"
-          :key="crumb"
-          class="crumb"
-          :disabled="index + 1 === directoryCrumbs.length"
-          @click="onCrumbSelect(index, crumb)"
-          >{{ crumb }}</Button
-        >
-      </div>
+      <Crumbs :path="directoryLocation" @select="navigateTo" />
     </div>
     <ApolloQuery
       :query="require('../graphql/Directory.gql')"
@@ -60,6 +51,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 
 import { DirectoryEntry } from '@i/DirectoryEntry';
+import { ConfirmationResponse } from '@i/ConfirmationResponse';
 import Button from '@/components/Button.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
 import LoadingBouncer from '@/components/LoadingBouncer.vue';
@@ -68,6 +60,7 @@ import FileIcon from '@/components/Icons/FileIcon.vue';
 import FolderIcon from '@/components/Icons/FolderIcon.vue';
 import ImageIcon from '@/components/Icons/ImageIcon.vue';
 import VideoIcon from '@/components/Icons/VideoIcon.vue';
+import Crumbs from '@/components/Crumbs.vue';
 
 @Component({
   components: {
@@ -78,7 +71,8 @@ import VideoIcon from '@/components/Icons/VideoIcon.vue';
     FileIcon,
     FolderIcon,
     ImageIcon,
-    VideoIcon
+    VideoIcon,
+    Crumbs
   },
   metaInfo() {
     return {
@@ -88,7 +82,7 @@ import VideoIcon from '@/components/Icons/VideoIcon.vue';
 })
 export default class Directory extends Vue {
   @Watch('$route')
-  onRouteChange(oldRoute: Route, newRoute: Route) {
+  onRouteChange(newRoute: Route, oldRoute: Route) {
     const prev = oldRoute.query['loc'];
     const curr = newRoute.query['loc'];
 
@@ -97,43 +91,43 @@ export default class Directory extends Vue {
     }
   }
 
-  get directoryCrumbs() {
-    const crumbs = this.directoryLocation.split('\\');
-    console.log('dc > ', this.directoryLocation, this.directoryCrumbs);
-    return crumbs;
-  }
-
   get directoryLocation() {
     const loc = this.$route.query['loc'];
     return (loc instanceof Array ? loc.pop() : loc) ?? '';
   }
 
-  private handleSelect(item: DirectoryEntry) {
+  private async handleSelect(item: DirectoryEntry) {
     if (item.isDirectory) {
       this.navigateTo(item.path);
     } else {
-      console.log(
-        'isFile > make request triggering file as child process',
-        item
-      );
+      const result = await this.$apollo.query<ConfirmationResponse>({
+        fetchPolicy: 'network-only',
+        query: require('../graphql/FileAction.gql'),
+        variables: { path: item.path }
+      });
+
+      if (!result.data.success) {
+        // TODO
+        // Handle error
+        console.error(result, item);
+      }
     }
   }
 
-  private onCrumbSelect(index: number) {
-    const targetDirectory = this.directoryCrumbs.slice(0, index).join('\\');
-    this.navigateTo(targetDirectory);
-  }
-
   private navigateTo(directory: string) {
-    this.$router.push(`/directory?loc=${directory}`);
+    const param = window.encodeURIComponent(directory);
+    this.$router.push(`/directory?loc=${param}`);
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/_mixins.scss';
+
 .directory {
   &__header {
     display: flex;
+    flex-flow: wrap;
     align-items: center;
   }
 }

@@ -17,3 +17,8 @@ type DirectoryResponse {
   entries: [DirectoryEntry]!
   canGallery: Boolean
 }
+
+type ConfirmationResponse {
+  success: Boolean
+  errorMessages: [String]
+}
