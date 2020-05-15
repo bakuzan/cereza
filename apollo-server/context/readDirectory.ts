@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 
-import { DirectoryEntry } from '../../interfaces/DirectoryEntry';
+import { DirectoryEntry } from '@i/DirectoryEntry';
 import { isImage, isVideo } from './checkFileType';
 
 const readdir = promisify(fs.readdir);

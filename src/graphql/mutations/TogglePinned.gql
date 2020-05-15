@@ -1,0 +1,7 @@
+mutation TogglePinned($path: String!) {
+  togglePinned(path: $path) {
+    success
+    messages
+    errorMessages
+  }
+}

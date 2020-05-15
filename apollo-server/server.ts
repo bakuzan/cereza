@@ -2,6 +2,8 @@ import './type-defs';
 import path from 'path';
 import express from 'express';
 
+import { Environment } from './constants';
+
 const distPath = path.resolve(__dirname, '../dist');
 
 export default (app: express.Application) => {
@@ -13,7 +15,7 @@ export default (app: express.Application) => {
   app.use(express.static(distPath));
 
   // Always return the main index.html, so router render the route in the client
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === Environment.Production) {
     app.get('*', (req, res, next) => {
       // if (req.url.includes('graphql')) {
       //   next();

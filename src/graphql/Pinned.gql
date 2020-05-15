@@ -1,0 +1,6 @@
+query AllPinned {
+  allPinned {
+    id
+    path
+  }
+}

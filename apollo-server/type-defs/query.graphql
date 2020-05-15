@@ -13,4 +13,12 @@ type Query {
 
   "Activate file default action"
   fileAction(path: String!): ConfirmationResponse
+
+  "Fetch all pinned directories"
+  allPinned: [Pinned]
+}
+
+type Mutation {
+  "Add or Delete Pinned directory of path"
+  togglePinned(path: String!): ConfirmationResponse
 }

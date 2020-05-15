@@ -18,7 +18,14 @@ type DirectoryResponse {
   canGallery: Boolean
 }
 
+type Pinned {
+  path: String
+}
+
+# Generic responses below
+
 type ConfirmationResponse {
   success: Boolean
   errorMessages: [String]
+  messages: [String]
 }

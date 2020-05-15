@@ -20,6 +20,7 @@
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   "include": [
+    "apollo-server/**/*.ts",
     "interfaces/**/*.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
