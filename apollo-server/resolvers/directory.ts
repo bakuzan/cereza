@@ -2,8 +2,8 @@ import child from 'child_process';
 import { promisify } from 'util';
 
 import { DirectoryArgs } from '@i/DirectoryArgs';
-import createResolver from '#/utils/createResolver';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
+import createResolver from '../utils/createResolver';
 
 const execProcess = promisify(child.exec);
 

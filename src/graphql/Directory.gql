@@ -1,4 +1,5 @@
 query Directory($path: String!) {
+  isDirectoryPinned(path: $path)
   directory(path: $path) {
     canGallery
     entries {

@@ -1,8 +1,9 @@
 import path from 'path';
 import child from 'child_process';
 import { promisify } from 'util';
-import createResolver from '#/utils/createResolver';
+
 import { Disk } from '@i/Disk';
+import createResolver from '../utils/createResolver';
 
 const execProcess = promisify(child.exec);
 

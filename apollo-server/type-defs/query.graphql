@@ -16,6 +16,9 @@ type Query {
 
   "Fetch all pinned directories"
   allPinned: [Pinned]
+
+  "Is Directory pinned"
+  isDirectoryPinned(path: String!): Boolean
 }
 
 type Mutation {

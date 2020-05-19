@@ -11,24 +11,42 @@
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
 
-        <ErrorBlock
-          v-else-if="error"
-          :data="error"
-          message="Failed to fetch directory contents."
-        />
+        <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch directory contents." />
 
         <div v-else-if="data && data.directory" class="result apollo">
-          <div>put response based controls here...like gallery button</div>
+          <ApolloMutation
+            :mutation="require('../graphql/mutations/TogglePinned.gql')"
+            :variables="{ path: directoryLocation }"
+            :optimisticResponse="togglePinnedOptimisticResponse"
+            @done="onDone"
+          >
+            <template v-slot="{ mutate, loading: mutateLoading, error: mutateError }">
+              <div class="flex flex--end">
+                <Button
+                  :class="{
+                    'pin-button': true,
+                    'pin-button--pinned': data.isDirectoryPinned,
+                    'pin-button--unpinned': !data.isDirectoryPinned
+                  }"
+                  :disabled="mutateLoading"
+                  @click="mutate({ update: onUpdate })"
+                >
+                  {{
+                  data.isDirectoryPinned ? `\uD83D\uDCCC\uFE0E Pinned` : 'Pin'
+                  }}
+                </Button>
+                <p v-if="mutateError">
+                  Failed directory
+                  {{ data.isDirectoryPinned ? 'unpinning' : 'pinning' }}:
+                  {{ mutateError }}
+                </p>
+              </div>
+            </template>
+          </ApolloMutation>
+
           <ul class="grid directory-list">
-            <li
-              v-for="item of data.directory.entries"
-              :key="item.path"
-              class="directory-item"
-            >
-              <Button
-                class="directory-item__button"
-                @click="handleSelect(item)"
-              >
+            <li v-for="item of data.directory.entries" :key="item.path" class="directory-item">
+              <Button class="directory-item__button" @click="handleSelect(item)">
                 <FolderIcon v-if="item.isDirectory" />
                 <ImageIcon v-else-if="item.isImage" />
                 <VideoIcon v-else-if="item.isVideo" />
@@ -47,8 +65,10 @@
 </template>
 
 <script lang="ts">
+import VueApollo from 'vue-apollo';
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Route } from 'vue-router';
+import { FetchResult } from 'apollo-link';
 
 import { DirectoryEntry } from '@i/DirectoryEntry';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
@@ -81,6 +101,16 @@ import Crumbs from '@/components/Crumbs.vue';
   }
 })
 export default class Directory extends Vue {
+  private readonly togglePinnedOptimisticResponse = {
+    __typename: 'Mutation',
+    togglePinned: {
+      __typename: 'ConfirmationResponse',
+      success: true,
+      messages: [],
+      errorMessages: []
+    }
+  };
+
   @Watch('$route')
   onRouteChange(newRoute: Route, oldRoute: Route) {
     const prev = oldRoute.query['loc'];
@@ -117,6 +147,37 @@ export default class Directory extends Vue {
   private navigateTo(directory: string) {
     const param = window.encodeURIComponent(directory);
     this.$router.push(`/directory?loc=${param}`);
+  }
+
+  private onUpdate(
+    proxy: VueApollo,
+    result: FetchResult<ConfirmationResponse>
+  ) {
+    const togglePinned = result.data;
+
+    const data = proxy.readQuery({
+      query: require('../graphql/Directory.gql'),
+      variables: { path: this.directoryLocation }
+    });
+
+    const isDirectoryPinned =
+      togglePinned && togglePinned.success
+        ? !data.isDirectoryPinned
+        : data.isDirectoryPinned;
+    console.log('update ? ', togglePinned, data, isDirectoryPinned);
+    proxy.writeQuery({
+      query: require('../graphql/Directory.gql'),
+      variables: { path: this.directoryLocation },
+      data: {
+        ...data,
+        isDirectoryPinned
+      }
+    });
+  }
+
+  private onDone(result: FetchResult<ConfirmationResponse>) {
+    // Placeholder
+    console.log('Done ?  ', result);
   }
 }
 </script>
@@ -161,6 +222,20 @@ export default class Directory extends Vue {
 
   &:hover {
     border-color: var(--accent-colour);
+  }
+}
+
+.pin-button {
+  justify-content: center;
+  min-width: 100px;
+
+  &--pinned {
+    background-color: var(--disabled-colour);
+  }
+
+  &--unpinned {
+    background-color: var(--accent-colour);
+    color: var(--accent-contrast);
   }
 }
 </style>

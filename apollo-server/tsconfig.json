@@ -12,25 +12,13 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "types": [
-      "webpack-env",
-      "vue-cli-plugin-apollo/types",
-      "vue-apollo/types",
-      "apollo-link/lib/types.d.ts"
-    ],
+    "types": ["webpack-env", "vue-cli-plugin-apollo/types", "vue-apollo/types"],
     "paths": {
-      "@/*": ["src/*"],
-      "@i/*": ["interfaces/*"]
+      "@i/*": ["../interfaces/*"],
+      "#/*": ["./*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": [
-    "interfaces/**/*.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
-  ],
+  "include": ["./**/*.ts", "../interfaces/**/*.ts"],
   "exclude": ["node_modules"]
 }
