@@ -9,6 +9,7 @@
       <router-link class="app-header__link" to="/about">About</router-link>
     </nav>
     <main>
+      <div class="app-image"></div>
       <router-view />
     </main>
   </div>
@@ -94,6 +95,10 @@ a {
 .flex {
   display: flex;
 
+  &--spaced {
+    justify-content: space-between;
+  }
+
   &--end {
     justify-content: flex-end;
   }
@@ -121,6 +126,16 @@ a {
 
 <style lang="scss" scoped>
 $padding: 5px;
+
+.app-image {
+  position: fixed;
+  top: var(--header-height);
+  background: url('./assets/logo.png') no-repeat center;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0.25;
+  pointer-events: none;
+}
 
 .app-header {
   position: fixed;

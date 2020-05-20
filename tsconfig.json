@@ -12,12 +12,7 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "types": [
-      "webpack-env",
-      "vue-cli-plugin-apollo/types",
-      "vue-apollo/types",
-      "apollo-link/lib/types.d.ts"
-    ],
+    "types": ["webpack-env", "vue-cli-plugin-apollo/types", "vue-apollo/types"],
     "paths": {
       "@/*": ["src/*"],
       "@i/*": ["interfaces/*"]

@@ -1,11 +1,18 @@
 import { PinnedArgs } from '@i/PinnedArgs';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
 
+import { pathToFolderName } from '../utils';
 import createResolver from '../utils/createResolver';
 
 export default createResolver({
   Query: {
-    allPinned: async (_, __, context) => await context.Pinned.findAll(),
+    async allPinned(_, __, context) {
+      const items = await context.Pinned.findAll();
+
+      return items.sort((a, b) =>
+        pathToFolderName(a.path).localeCompare(pathToFolderName(b.path))
+      );
+    },
     async isDirectoryPinned(_, args: PinnedArgs, context): Promise<boolean> {
       const item = await context.Pinned.findOne({ where: { path: args.path } });
       return item !== null;

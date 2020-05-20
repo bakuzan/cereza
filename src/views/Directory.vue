@@ -14,36 +14,65 @@
         <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch directory contents." />
 
         <div v-else-if="data && data.directory" class="result apollo">
-          <ApolloMutation
-            :mutation="require('../graphql/mutations/TogglePinned.gql')"
-            :variables="{ path: directoryLocation }"
-            :optimisticResponse="togglePinnedOptimisticResponse"
-            @done="onDone"
-          >
-            <template v-slot="{ mutate, loading: mutateLoading, error: mutateError }">
-              <div class="flex flex--end">
-                <Button
-                  :class="{
-                    'pin-button': true,
-                    'pin-button--pinned': data.isDirectoryPinned,
-                    'pin-button--unpinned': !data.isDirectoryPinned
-                  }"
-                  :disabled="mutateLoading"
-                  @click="mutate({ update: onUpdate })"
+          <div class="flex flex--spaced">
+            <input type="text" />
+            <ApolloMutation
+              :mutation="require('../graphql/mutations/TogglePinned.gql')"
+              :variables="{ path: directoryLocation }"
+              @done="onDone"
+            >
+              <template v-slot="{ mutate, loading: mutateLoading, error: mutateError }">
+                <ApolloQuery
+                  :query="require('../graphql/IsDirectoryPinned.gql')"
+                  :variables="{ path: directoryLocation }"
                 >
-                  {{
-                  data.isDirectoryPinned ? `\uD83D\uDCCC\uFE0E Pinned` : 'Pin'
-                  }}
-                </Button>
-                <p v-if="mutateError">
-                  Failed directory
-                  {{ data.isDirectoryPinned ? 'unpinning' : 'pinning' }}:
-                  {{ mutateError }}
-                </p>
-              </div>
-            </template>
-          </ApolloMutation>
-
+                  <template slot-scope="{ result: pinResult }">
+                    <Button
+                      v-if="pinResult && pinResult.data"
+                      :class="{
+                        'pin-button': true,
+                        'pin-button--pinned': pinResult.data.isDirectoryPinned,
+                        'pin-button--unpinned': !pinResult.data.isDirectoryPinned
+                      }"
+                      :disabled="pinResult.loading || mutateLoading"
+                      @click="
+                        mutate({
+                          refetchQueries: [
+                            {
+                              query: require('../graphql/IsDirectoryPinned.gql'),
+                              variables: { path: directoryLocation }
+                            },
+                            { 
+                              query: require('../graphql/Pinned.gql'),
+                              variables: { path: directoryLocation } 
+                            }
+                          ]
+                        })
+                      "
+                    >
+                      <PinIcon
+                        v-if="!pinResult.loading && !mutateLoading"
+                        :fill="true"
+                        :contrast="!pinResult.data.isDirectoryPinned"
+                      />
+                      {{
+                      pinResult.loading || mutateLoading
+                      ? ''
+                      : pinResult.data.isDirectoryPinned
+                      ? 'Unpin'
+                      : 'Pin'
+                      }}
+                    </Button>
+                    <p v-if="mutateError">
+                      Failed directory
+                      {{ data.isDirectoryPinned ? ' unpinning' : ' pinning' }}:
+                      {{ mutateError }}
+                    </p>
+                  </template>
+                </ApolloQuery>
+              </template>
+            </ApolloMutation>
+          </div>
           <ul class="grid directory-list">
             <li v-for="item of data.directory.entries" :key="item.path" class="directory-item">
               <Button class="directory-item__button" @click="handleSelect(item)">
@@ -80,6 +109,7 @@ import FileIcon from '@/components/Icons/FileIcon.vue';
 import FolderIcon from '@/components/Icons/FolderIcon.vue';
 import ImageIcon from '@/components/Icons/ImageIcon.vue';
 import VideoIcon from '@/components/Icons/VideoIcon.vue';
+import PinIcon from '@/components/Icons/PinIcon.vue';
 import Crumbs from '@/components/Crumbs.vue';
 
 @Component({
@@ -92,6 +122,7 @@ import Crumbs from '@/components/Crumbs.vue';
     FolderIcon,
     ImageIcon,
     VideoIcon,
+    PinIcon,
     Crumbs
   },
   metaInfo() {
@@ -101,16 +132,6 @@ import Crumbs from '@/components/Crumbs.vue';
   }
 })
 export default class Directory extends Vue {
-  private readonly togglePinnedOptimisticResponse = {
-    __typename: 'Mutation',
-    togglePinned: {
-      __typename: 'ConfirmationResponse',
-      success: true,
-      messages: [],
-      errorMessages: []
-    }
-  };
-
   @Watch('$route')
   onRouteChange(newRoute: Route, oldRoute: Route) {
     const prev = oldRoute.query['loc'];
@@ -149,35 +170,8 @@ export default class Directory extends Vue {
     this.$router.push(`/directory?loc=${param}`);
   }
 
-  private onUpdate(
-    proxy: VueApollo,
-    result: FetchResult<ConfirmationResponse>
-  ) {
-    const togglePinned = result.data;
-
-    const data = proxy.readQuery({
-      query: require('../graphql/Directory.gql'),
-      variables: { path: this.directoryLocation }
-    });
-
-    const isDirectoryPinned =
-      togglePinned && togglePinned.success
-        ? !data.isDirectoryPinned
-        : data.isDirectoryPinned;
-    console.log('update ? ', togglePinned, data, isDirectoryPinned);
-    proxy.writeQuery({
-      query: require('../graphql/Directory.gql'),
-      variables: { path: this.directoryLocation },
-      data: {
-        ...data,
-        isDirectoryPinned
-      }
-    });
-  }
-
   private onDone(result: FetchResult<ConfirmationResponse>) {
     // Placeholder
-    console.log('Done ?  ', result);
   }
 }
 </script>
@@ -226,7 +220,8 @@ export default class Directory extends Vue {
 }
 
 .pin-button {
-  justify-content: center;
+  justify-content: space-evenly;
+  min-height: 2.5rem;
   min-width: 100px;
 
   &--pinned {

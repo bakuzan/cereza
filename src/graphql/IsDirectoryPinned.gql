@@ -1,0 +1,3 @@
+query IsDirectoryPinned($path: String!) {
+  isDirectoryPinned(path: $path)
+}

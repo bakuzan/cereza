@@ -1,17 +1,20 @@
 <template>
   <div class="page home">
-    <div class="home-image"></div>
+    <PinnedList @select="handleSelect" />
     <Disks @select="handleSelect" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Disks from '@/components/Disks.vue';
+
 import { Disk } from '@i/Disk';
+import { Pinned } from '@i/Pinned';
+import Disks from '@/components/Disks.vue';
+import PinnedList from '@/components/Pinned.vue';
 
 @Component({
-  components: { Disks },
+  components: { Disks, PinnedList },
   metaInfo() {
     return {
       title: 'Home'
@@ -19,20 +22,9 @@ import { Disk } from '@i/Disk';
   }
 })
 export default class Home extends Vue {
-  private handleSelect(item: Disk) {
-    this.$router.push(`/directory?loc=${item.path}`);
+  private handleSelect(item: Disk | Pinned) {
+    const param = window.encodeURIComponent(item.path);
+    this.$router.push(`/directory?loc=${param}`);
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.home-image {
-  position: fixed;
-  top: var(--header-height);
-  background: url('../assets/logo.png') no-repeat center;
-  width: 100vw;
-  height: 100vh;
-  opacity: 0.25;
-  pointer-events: none;
-}
-</style>
