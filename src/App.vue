@@ -32,6 +32,9 @@ export default class App extends Vue {}
 </script>
 
 <style lang="scss">
+@import './styles/_ripple.scss';
+@import './styles/_floatLabel.scss';
+
 :root {
   --font-family: 'Lucida Console', 'Courier New', monospace;
   --font-size: 16px;

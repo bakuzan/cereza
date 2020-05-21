@@ -15,7 +15,14 @@
 
         <div v-else-if="data && data.directory" class="result apollo">
           <div class="flex flex--spaced">
-            <input type="text" />
+            <InputBox
+              id="filter"
+              class="filter-box"
+              name="filter"
+              label="Filter current directory..."
+              :value="filter"
+              @change="onFilter"
+            />
             <ApolloMutation
               :mutation="require('../graphql/mutations/TogglePinned.gql')"
               :variables="{ path: directoryLocation }"
@@ -32,19 +39,17 @@
                       :class="{
                         'pin-button': true,
                         'pin-button--pinned': pinResult.data.isDirectoryPinned,
-                        'pin-button--unpinned': !pinResult.data.isDirectoryPinned
+                        'pin-button--unpinned': !pinResult.data
+                          .isDirectoryPinned
                       }"
                       :disabled="pinResult.loading || mutateLoading"
                       @click="
                         mutate({
+                          update: onUpdate,
                           refetchQueries: [
                             {
                               query: require('../graphql/IsDirectoryPinned.gql'),
                               variables: { path: directoryLocation }
-                            },
-                            { 
-                              query: require('../graphql/Pinned.gql'),
-                              variables: { path: directoryLocation } 
                             }
                           ]
                         })
@@ -74,7 +79,13 @@
             </ApolloMutation>
           </div>
           <ul class="grid directory-list">
-            <li v-for="item of data.directory.entries" :key="item.path" class="directory-item">
+            <li
+              v-for="item of data.directory.entries.filter((x) =>
+                x.name.toLowerCase().includes(filter)
+              )"
+              :key="item.path"
+              class="directory-item"
+            >
               <Button class="directory-item__button" @click="handleSelect(item)">
                 <FolderIcon v-if="item.isDirectory" />
                 <ImageIcon v-else-if="item.isImage" />
@@ -101,6 +112,7 @@ import { FetchResult } from 'apollo-link';
 
 import { DirectoryEntry } from '@i/DirectoryEntry';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
+import { CRZDataProxy } from '@/types/CRZDataProxy';
 import Button from '@/components/Button.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
 import LoadingBouncer from '@/components/LoadingBouncer.vue';
@@ -111,6 +123,7 @@ import ImageIcon from '@/components/Icons/ImageIcon.vue';
 import VideoIcon from '@/components/Icons/VideoIcon.vue';
 import PinIcon from '@/components/Icons/PinIcon.vue';
 import Crumbs from '@/components/Crumbs.vue';
+import InputBox from '@/components/InputBox.vue';
 
 @Component({
   components: {
@@ -123,7 +136,8 @@ import Crumbs from '@/components/Crumbs.vue';
     ImageIcon,
     VideoIcon,
     PinIcon,
-    Crumbs
+    Crumbs,
+    InputBox
   },
   metaInfo() {
     return {
@@ -132,6 +146,8 @@ import Crumbs from '@/components/Crumbs.vue';
   }
 })
 export default class Directory extends Vue {
+  private filter = '';
+
   @Watch('$route')
   onRouteChange(newRoute: Route, oldRoute: Route) {
     const prev = oldRoute.query['loc'];
@@ -139,6 +155,7 @@ export default class Directory extends Vue {
 
     if (prev !== curr) {
       window.scrollTo(0, 0);
+      this.filter = '';
     }
   }
 
@@ -168,6 +185,14 @@ export default class Directory extends Vue {
   private navigateTo(directory: string) {
     const param = window.encodeURIComponent(directory);
     this.$router.push(`/directory?loc=${param}`);
+  }
+
+  private onFilter(value: string) {
+    this.filter = value.toLowerCase();
+  }
+
+  private onUpdate(client: CRZDataProxy) {
+    client.deleteQueryCRZ('allPinned');
   }
 
   private onDone(result: FetchResult<ConfirmationResponse>) {
