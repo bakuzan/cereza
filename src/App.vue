@@ -9,9 +9,9 @@
       <router-link class="app-header__link" to="/about">About</router-link>
     </nav>
     <main>
-      <div class="app-image"></div>
       <router-view />
-      <!-- TODO scroll top button -->
+      <div class="app-image"></div>
+      <ScrollTopButton />
     </main>
   </div>
 </template>
@@ -19,7 +19,10 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
+import ScrollTopButton from '@/components/ScrollTopButton.vue';
+
 @Component({
+  components: { ScrollTopButton },
   metaInfo() {
     return {
       titleTemplate: (value) => (value ? `${value} | Cereza` : 'Cereza'),
@@ -55,6 +58,10 @@ export default class App extends Vue {}
   --accent-colour: var(--highlight-one);
   --accent-colour--hover: var(--highlight-one-offset);
   --accent-contrast: #fff;
+
+  --scroll-top-button--background: var(--highlight-one);
+  --scroll-top-button--background-hover: var(--highlight-one-offset);
+  --scroll-top-button--colour: var(--accent-contrast);
 
   --danger-colour: red;
   --disabled-colour: #cccccc;
@@ -140,6 +147,7 @@ $padding: 5px;
   height: 100vh;
   opacity: 0.25;
   pointer-events: none;
+  z-index: -1;
 }
 
 .app-header {
@@ -152,6 +160,7 @@ $padding: 5px;
   background-color: var(--base-colour);
   color: var(--contrast-colour);
   box-shadow: 0px 0px 5px 3px var(--accent-colour);
+  z-index: 1000;
 
   &__link {
     color: var(--contrast-colour);

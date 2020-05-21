@@ -1,10 +1,5 @@
 <template>
-  <button
-    :class="buttonClasses"
-    :type="type"
-    :disabled="disabled"
-    @click="onClick"
-  >
+  <button :class="buttonClasses" :type="type" :disabled="disabled" @click="onClick">
     <slot></slot>
   </button>
 </template>
@@ -68,7 +63,7 @@ export default class Button extends Vue {
 
 .button--primary {
   background-color: var(--accent-colour);
-  color: var(--accent-constrast);
+  color: var(--accent-contrast);
 
   &:focus,
   &:hover,

@@ -23,12 +23,17 @@
               :value="filter"
               @change="onFilter"
             />
-            <Button
-              v-if="data.directory.canGallery"
-              class="reader-button"
-              :primary="true"
-              @click="onReader()"
-            >Reader Mode</Button>
+            <div class="flex-spacer"></div>
+            <div>
+              <Button
+                v-if="data.directory.canGallery"
+                class="reader-button"
+                :primary="true"
+                @click="onReader()"
+              >
+                <BookIcon :contrast="true" />Reader Mode
+              </Button>
+            </div>
             <ApolloMutation
               :mutation="require('../graphql/mutations/TogglePinned.gql')"
               :variables="{ path: directoryLocation }"
@@ -48,6 +53,7 @@
                         'pin-button--unpinned': !pinResult.data
                           .isDirectoryPinned
                       }"
+                      :primary="true"
                       :disabled="pinResult.loading || mutateLoading"
                       @click="
                         mutate({
@@ -112,8 +118,7 @@
 
 <script lang="ts">
 import VueApollo from 'vue-apollo';
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import { Route } from 'vue-router';
+import { Component, Vue } from 'vue-property-decorator';
 import { FetchResult } from 'apollo-link';
 
 import { DirectoryEntry } from '@i/DirectoryEntry';
@@ -128,6 +133,7 @@ import FolderIcon from '@/components/Icons/FolderIcon.vue';
 import ImageIcon from '@/components/Icons/ImageIcon.vue';
 import VideoIcon from '@/components/Icons/VideoIcon.vue';
 import PinIcon from '@/components/Icons/PinIcon.vue';
+import BookIcon from '@/components/Icons/BookIcon.vue';
 import Crumbs from '@/components/Crumbs.vue';
 import InputBox from '@/components/InputBox.vue';
 
@@ -142,6 +148,7 @@ import InputBox from '@/components/InputBox.vue';
     ImageIcon,
     VideoIcon,
     PinIcon,
+    BookIcon,
     Crumbs,
     InputBox
   },
@@ -153,17 +160,6 @@ import InputBox from '@/components/InputBox.vue';
 })
 export default class Directory extends Vue {
   private filter = '';
-
-  @Watch('$route')
-  onRouteChange(newRoute: Route, oldRoute: Route) {
-    const prev = oldRoute.query['loc'];
-    const curr = newRoute.query['loc'];
-
-    if (prev !== curr) {
-      window.scrollTo(0, 0);
-      this.onFilter({ value: '' });
-    }
-  }
 
   get directoryLocation() {
     const loc = this.$route.query['loc'];
@@ -254,18 +250,21 @@ export default class Directory extends Vue {
   }
 }
 
-.pin-button {
+.pin-button,
+.reader-button {
   justify-content: space-evenly;
   min-height: 2.5rem;
   min-width: 100px;
+}
 
-  &--pinned {
+.pin-button--pinned {
+  background-color: var(--disabled-colour);
+  color: inherit;
+
+  &:focus,
+  &:hover,
+  &:active {
     background-color: var(--disabled-colour);
-  }
-
-  &--unpinned {
-    background-color: var(--accent-colour);
-    color: var(--accent-contrast);
   }
 }
 </style>
