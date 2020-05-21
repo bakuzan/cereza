@@ -2,10 +2,11 @@ import { DataProxy } from 'apollo-cache';
 import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory';
 
 export default () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const proto = InMemoryCache.prototype as any;
 
-  proto.readQuerySafeCRZ = function readQuerySafe(
-    options: DataProxy.Query<any>
+  proto.readQuerySafeCRZ = function readQuerySafe<T>(
+    options: DataProxy.Query<T>
   ) {
     try {
       return this.readQuery(options);

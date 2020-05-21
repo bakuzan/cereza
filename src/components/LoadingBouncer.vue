@@ -22,11 +22,7 @@ export default class LoadingBouncer extends Vue {
   }
 
   get bouncerClasses() {
-    return classNames(
-      'loading-bouncer__circle',
-      'themed-background',
-      this.cirlceClass
-    );
+    return classNames('loading-bouncer__circle', this.cirlceClass);
   }
 }
 </script>
@@ -69,6 +65,7 @@ export default class LoadingBouncer extends Vue {
     margin: 1.5rem 0.2rem;
     border-radius: 50%;
     animation: bouncing 0.6s infinite alternate;
+    background-color: var(--accent-colour);
 
     &:nth-child(2) {
       animation-delay: 0.2s;

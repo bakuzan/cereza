@@ -20,6 +20,12 @@ const routes: Array<RouteConfig> = [
     name: 'Directory',
     component: () =>
       import(/* webpackChunkName: "directory" */ '../views/Directory.vue')
+  },
+  {
+    path: '/gallery-reader',
+    name: 'Reader',
+    component: () =>
+      import(/* webpackChunkName: "reader" */ '../views/Reader.vue')
   }
 ];
 

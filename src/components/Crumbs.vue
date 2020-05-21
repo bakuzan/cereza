@@ -7,8 +7,9 @@
       :link="true"
       :disabled="crumb.isLast"
       @click="onCrumbSelect(crumb.path)"
-      >{{ crumb.text }}</Button
     >
+      <div>{{ crumb.text }}</div>
+    </Button>
   </div>
 </template>
 
@@ -79,7 +80,7 @@ export default class Crumbs extends Vue {
   padding: 2px 5px;
 }
 
-.crumb--active::after {
+.crumb--active > div::after {
   content: '\\';
 }
 </style>

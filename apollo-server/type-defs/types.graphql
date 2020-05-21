@@ -14,9 +14,17 @@ type DirectoryEntry {
 }
 
 type DirectoryResponse {
-  entries: [DirectoryEntry]!
   canGallery: Boolean
+  entries: [DirectoryEntry]!
 }
+
+type GalleryResponse {
+  canGallery: Boolean
+  folderName: String
+  images: [String]!
+}
+
+# Db models
 
 type Pinned {
   id: Int

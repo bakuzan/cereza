@@ -3,6 +3,7 @@ import { promisify } from 'util';
 
 import { DirectoryArgs } from '@i/DirectoryArgs';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
+import { pathToFolderName } from '../utils';
 import createResolver from '../utils/createResolver';
 
 const execProcess = promisify(child.exec);
@@ -21,6 +22,22 @@ export default createResolver({
               : -1
             : a.name.localeCompare(b.name)
         )
+      };
+    },
+    async gallery(_, args: DirectoryArgs, context) {
+      const entries = await context.readDirectory(args.path);
+      const canGallery = entries.every((x) => x.isImage);
+      const folderName = pathToFolderName(args.path);
+
+      let images: string[] = [];
+      if (canGallery) {
+        images = await context.readImages(entries);
+      }
+
+      return {
+        canGallery,
+        folderName,
+        images
       };
     },
     async fileAction(

@@ -11,6 +11,7 @@
     <main>
       <div class="app-image"></div>
       <router-view />
+      <!-- TODO scroll top button -->
     </main>
   </div>
 </template>
@@ -72,7 +73,8 @@ body {
 }
 
 body,
-button {
+button,
+input {
   font-family: var(--font-family);
   font-size: var(--font-size);
 }
@@ -167,6 +169,10 @@ $padding: 5px;
   &__link:hover {
     text-decoration: none;
     color: inherit;
+  }
+
+  &__link:hover {
+    color: var(--accent-colour);
   }
 }
 </style>

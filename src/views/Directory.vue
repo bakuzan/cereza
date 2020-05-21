@@ -17,12 +17,18 @@
           <div class="flex flex--spaced">
             <InputBox
               id="filter"
-              class="filter-box"
+              class-name="filter-box"
               name="filter"
               label="Filter current directory..."
               :value="filter"
               @change="onFilter"
             />
+            <Button
+              v-if="data.directory.canGallery"
+              class="reader-button"
+              :primary="true"
+              @click="onReader()"
+            >Reader Mode</Button>
             <ApolloMutation
               :mutation="require('../graphql/mutations/TogglePinned.gql')"
               :variables="{ path: directoryLocation }"
@@ -155,7 +161,7 @@ export default class Directory extends Vue {
 
     if (prev !== curr) {
       window.scrollTo(0, 0);
-      this.filter = '';
+      this.onFilter({ value: '' });
     }
   }
 
@@ -175,8 +181,7 @@ export default class Directory extends Vue {
       });
 
       if (!result.data.success) {
-        // TODO
-        // Handle error
+        // TODO Handle error
         console.error(result, item);
       }
     }
@@ -187,8 +192,8 @@ export default class Directory extends Vue {
     this.$router.push(`/directory?loc=${param}`);
   }
 
-  private onFilter(value: string) {
-    this.filter = value.toLowerCase();
+  private onFilter({ value }: { value: string }) {
+    this.$set(this, 'filter', value.toLowerCase());
   }
 
   private onUpdate(client: CRZDataProxy) {
@@ -197,6 +202,11 @@ export default class Directory extends Vue {
 
   private onDone(result: FetchResult<ConfirmationResponse>) {
     // Placeholder
+  }
+
+  private onReader() {
+    const param = window.encodeURIComponent(this.directoryLocation);
+    this.$router.push(`/gallery-reader?loc=${param}`);
   }
 }
 </script>
@@ -221,12 +231,16 @@ export default class Directory extends Vue {
 .directory-item {
   display: flex;
   align-items: center;
-  border: 1px solid transparent;
 
   &__button {
     width: 100%;
+    border: 1px solid transparent;
 
-    &:hover {
+    &:focus,
+    &:hover,
+    &:active {
+      border-color: var(--accent-colour);
+
       .directory-item__name {
         text-decoration: underline;
       }
@@ -237,10 +251,6 @@ export default class Directory extends Vue {
     font-size: 1.2rem;
     white-space: pre-line;
     text-align: left;
-  }
-
-  &:hover {
-    border-color: var(--accent-colour);
   }
 }
 
@@ -261,8 +271,14 @@ export default class Directory extends Vue {
 </style>
 
 <style lang="scss">
-.directory-item__button:hover svg {
-  stroke: var(--accent-contrast);
-  fill: var(--accent-colour);
+.directory-item__button {
+  &:focus,
+  &:hover,
+  &:active {
+    svg {
+      stroke: var(--accent-contrast);
+      fill: var(--accent-colour);
+    }
+  }
 }
 </style>

@@ -16,13 +16,9 @@
       @keydown="onKeyDown"
     />
     <label :for="id" class="input-box__label">{{ label }}</label>
-    <Button
-      v-show="showClearButton"
-      :class-name="clearClasses"
-      :icon="icon"
-      size="small"
-      @click="clearAndFocusInput"
-    />
+    <Button v-show="showClearButton" :class-name="clearClasses" @click="clearAndFocusInput">
+      <CrossIcon />
+    </Button>
     <span v-show="showCount" class="input-box__count">{{ countText }}</span>
   </div>
 </template>
@@ -32,12 +28,13 @@ import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import classNames from 'classnames';
 
 import Button from '@/components/Button.vue';
-import { Icons } from '@/constants';
+import CrossIcon from '@/components/Icons/CrossIcon.vue';
 import { getEventValue } from '@/utils';
 
 @Component({
   components: {
-    Button
+    Button,
+    CrossIcon
   }
 })
 export default class InputBox extends Vue {
@@ -57,7 +54,6 @@ export default class InputBox extends Vue {
   @Prop({ default: false }) readonly disabled!: boolean;
 
   private clearTimer = 0;
-  private icon = Icons.cross;
 
   get showClearButton() {
     return !!this.value && this.isTextInput;
@@ -106,7 +102,8 @@ export default class InputBox extends Vue {
 
   // Methods
   private clearAndFocusInput() {
-    this.$emit('change', '', this.name);
+    this.$emit('change', { value: '', name: this.name });
+
     clearTimeout(this.clearTimer);
     this.clearTimer = window.setTimeout(
       () => (this.$el?.firstChild as HTMLInputElement)?.focus(),
@@ -119,7 +116,7 @@ export default class InputBox extends Vue {
     const target = event.target as HTMLInputElement;
     const value = getEventValue(target);
 
-    this.$emit('change', '', value, target.name);
+    return { value, name: this.name };
   }
 
   @Emit('focus')
@@ -188,8 +185,12 @@ input {
   }
 
   &__clear {
+    $width: 24px;
+    justify-content: center;
     position: relative;
-    right: 30px;
+    right: $width;
+    min-width: $width;
+    padding: 1px 2px;
   }
 
   &__count {

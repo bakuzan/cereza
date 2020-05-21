@@ -11,6 +11,9 @@ type Query {
   "Fetch directory contents"
   directory(path: String!): DirectoryResponse
 
+  "Fetch gallery directory contents"
+  gallery(path: String!): GalleryResponse
+
   "Activate file default action"
   fileAction(path: String!): ConfirmationResponse
 
