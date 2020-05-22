@@ -41,7 +41,6 @@
 <script lang="ts">
 import { Component, Emit, Vue } from 'vue-property-decorator';
 
-import { Disk } from '@i/Disk';
 import { Pinned } from '@i/Pinned';
 import Button from '@/components/Button.vue';
 import PinIcon from '@/components/Icons/PinIcon.vue';

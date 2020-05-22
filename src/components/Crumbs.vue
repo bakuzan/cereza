@@ -76,6 +76,7 @@ export default class Crumbs extends Vue {
 <style lang="scss" scoped>
 .crumbs {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   padding: 2px 5px;
 }

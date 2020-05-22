@@ -14,7 +14,7 @@
         <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch directory contents." />
 
         <div v-else-if="data && data.directory" class="result apollo">
-          <div class="flex flex--spaced">
+          <div class="flex flex--spaced directory__actions">
             <InputBox
               id="filter"
               class-name="filter-box"
@@ -37,7 +37,7 @@
             <ApolloMutation
               :mutation="require('../graphql/mutations/TogglePinned.gql')"
               :variables="{ path: directoryLocation }"
-              @done="onDone"
+              @done="() => null"
             >
               <template v-slot="{ mutate, loading: mutateLoading, error: mutateError }">
                 <ApolloQuery
@@ -117,9 +117,7 @@
 </template>
 
 <script lang="ts">
-import VueApollo from 'vue-apollo';
 import { Component, Vue } from 'vue-property-decorator';
-import { FetchResult } from 'apollo-link';
 
 import { DirectoryEntry } from '@i/DirectoryEntry';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
@@ -196,10 +194,6 @@ export default class Directory extends Vue {
     client.deleteQueryCRZ('allPinned');
   }
 
-  private onDone(result: FetchResult<ConfirmationResponse>) {
-    // Placeholder
-  }
-
   private onReader() {
     const param = window.encodeURIComponent(this.directoryLocation);
     this.$router.push(`/gallery-reader?loc=${param}`);
@@ -215,6 +209,12 @@ export default class Directory extends Vue {
     display: flex;
     flex-flow: wrap;
     align-items: center;
+  }
+
+  @include respondToAll((xxs, xs)) {
+    &__actions {
+      flex-wrap: wrap;
+    }
   }
 }
 
@@ -266,6 +266,18 @@ export default class Directory extends Vue {
   &:active {
     background-color: var(--disabled-colour);
   }
+}
+
+.result.apollo {
+  margin: 10px 0;
+
+  @include respondToAll((xxs, xs)) {
+    margin: 20px 0;
+  }
+}
+
+.filter-box {
+  min-width: 250px;
 }
 </style>
 

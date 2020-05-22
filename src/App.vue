@@ -1,12 +1,14 @@
 <template>
-  <div class="app">
+  <div :class="appClasses">
     <nav class="app-header">
       <h1 class="app-title">
         <router-link class="app-title__link" to="/">Cereza</router-link>
       </h1>
       <div class="flex-spacer"></div>
       <router-link class="app-header__link" to="/">Home</router-link>|
-      <router-link class="app-header__link" to="/about">About</router-link>
+      <router-link class="app-header__link" to="/settings"
+        >Settings</router-link
+      >
     </nav>
     <main>
       <router-view />
@@ -18,8 +20,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import classNames from 'classnames';
 
 import ScrollTopButton from '@/components/ScrollTopButton.vue';
+import { store } from '@/utils/localStorage';
 
 @Component({
   components: { ScrollTopButton },
@@ -32,7 +36,28 @@ import ScrollTopButton from '@/components/ScrollTopButton.vue';
     };
   }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  private theme = '';
+  private unwatchTheme: () => void = () => null;
+
+  // Lifecycle
+  mounted() {
+    this.theme = store.getKey('theme');
+    this.unwatchTheme = store.subscribe(
+      'theme',
+      (value: string) => (this.theme = value)
+    );
+  }
+
+  beforeDestory() {
+    this.unwatchTheme();
+  }
+
+  // Computed
+  get appClasses() {
+    return classNames('app', 'theme', `theme--${this.theme}`);
+  }
+}
 </script>
 
 <style lang="scss">
@@ -59,12 +84,46 @@ export default class App extends Vue {}
   --accent-colour--hover: var(--highlight-one-offset);
   --accent-contrast: #fff;
 
+  --danger-colour: red;
+  --disabled-colour: #cccccc;
+}
+
+.theme {
   --scroll-top-button--background: var(--highlight-one);
   --scroll-top-button--background-hover: var(--highlight-one-offset);
   --scroll-top-button--colour: var(--accent-contrast);
 
-  --danger-colour: red;
-  --disabled-colour: #cccccc;
+  .app-image {
+    background: url('./assets/logo.png') no-repeat center;
+  }
+
+  &--bayo2 {
+    --accent-colour: var(--highlight-two);
+    --accent-colour--hover: var(--highlight-two-offset);
+    --accent-contrast: #fff;
+
+    --scroll-top-button--background: var(--highlight-two);
+    --scroll-top-button--background-hover: var(--highlight-two-offset);
+    --scroll-top-button--colour: var(--accent-contrast);
+
+    .app-image {
+      background: url('./assets/logo_bayo2.png') no-repeat center;
+    }
+  }
+
+  &--bayo3 {
+    --accent-colour: var(--highlight-three);
+    --accent-colour--hover: var(--highlight-three-offset);
+    --accent-contrast: #fff;
+
+    --scroll-top-button--background: var(--highlight-three);
+    --scroll-top-button--background-hover: var(--highlight-three-offset);
+    --scroll-top-button--colour: var(--accent-contrast);
+
+    .app-image {
+      background: url('./assets/logo_bayo3.png') no-repeat center;
+    }
+  }
 }
 
 html,
@@ -142,7 +201,6 @@ $padding: 5px;
 .app-image {
   position: fixed;
   top: var(--header-height);
-  background: url('./assets/logo.png') no-repeat center;
   width: 100vw;
   height: 100vh;
   opacity: 0.25;

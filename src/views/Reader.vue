@@ -7,7 +7,11 @@
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
 
-        <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch gallery contents." />
+        <ErrorBlock
+          v-else-if="error"
+          :data="error"
+          message="Failed to fetch gallery contents."
+        />
 
         <div v-else-if="data && data.gallery" class="result apollo">
           <div class="reader__header">
@@ -36,13 +40,22 @@
               <div class="reader-entry__counter">{{ index + 1 }}</div>
             </div>
             <div class="reader-pane__footer">
-              <Button class="reader__button" :link="true" @click="onCloseReader()">Back to directory</Button>
+              <Button
+                class="reader__button"
+                :link="true"
+                @click="onCloseReader()"
+                >Back to directory</Button
+              >
             </div>
-            <div class="reader-pane__info">{{ data.gallery.images.length }} pages</div>
+            <div class="reader-pane__info">
+              {{ data.gallery.images.length }} pages
+            </div>
           </div>
           <div v-else>
             <p>This directory is not a valid gallery reader directory.</p>
-            <Button class="reader__button" :link="true" @click="onCloseReader()">Back to directory</Button>
+            <Button class="reader__button" :link="true" @click="onCloseReader()"
+              >Back to directory</Button
+            >
           </div>
         </div>
 
