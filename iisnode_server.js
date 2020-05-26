@@ -2,8 +2,8 @@
 const execa = require('execa');
 
 async function init() {
-  await execa('vue-cli-service apollo:start').catch(() =>
-    console.log('CRZ: vue-cli-service apollo:start, Server failure.')
+  await execa('npm run apollo:start').catch(() =>
+    console.log('CRZ: npm run apollo:start, Server failure.')
   );
 }
 
