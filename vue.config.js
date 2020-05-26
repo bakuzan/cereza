@@ -7,7 +7,18 @@ module.exports = {
       cors: '*',
       enableMocks: false,
       typescript: true,
-      lintGQL: true
+      lintGQL: true,
+      serverOptions: {
+        introspection: true,
+        playground: {
+          settings: {
+            'editor.cursorShape': 'block',
+            'editor.fontSize': 16,
+            'editor.fontFamily': '"Lucida Console", Consolas, monospace',
+            'editor.theme': 'light'
+          }
+        }
+      }
     }
   },
   chainWebpack: (config) => {
