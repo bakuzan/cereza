@@ -26,6 +26,19 @@ const routes: Array<RouteConfig> = [
     name: 'Reader',
     component: () =>
       import(/* webpackChunkName: "reader" */ '../views/Reader.vue')
+  },
+  {
+    path: '/reel-viewer',
+    name: 'Reel',
+    component: () => import(/* webpackChunkName: "reel" */ '../views/Reel.vue')
+  },
+  {
+    path: '*',
+    name: 'PageNotFound',
+    component: () =>
+      import(
+        /* webpackChunkName: "page-not-found" */ '../views/PageNotFound.vue'
+      )
   }
 ];
 

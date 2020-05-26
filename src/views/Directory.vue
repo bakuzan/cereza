@@ -11,7 +11,11 @@
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
 
-        <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch directory contents." />
+        <ErrorBlock
+          v-else-if="error"
+          :data="error"
+          message="Failed to fetch directory contents."
+        />
 
         <div v-else-if="data && data.directory" class="result apollo">
           <div class="flex flex--spaced directory__actions">
@@ -27,11 +31,19 @@
             <div>
               <Button
                 v-if="data.directory.canGallery"
-                class="reader-button"
+                class="can-do-button"
                 :primary="true"
                 @click="onReader()"
               >
                 <BookIcon :contrast="true" />Reader Mode
+              </Button>
+              <Button
+                v-if="data.directory.canReel"
+                class="can-do-button"
+                :primary="true"
+                @click="onReel()"
+              >
+                <FilmIcon :contrast="true" />Reel Mode
               </Button>
             </div>
             <ApolloMutation
@@ -39,7 +51,9 @@
               :variables="{ path: directoryLocation }"
               @done="() => null"
             >
-              <template v-slot="{ mutate, loading: mutateLoading, error: mutateError }">
+              <template
+                v-slot="{ mutate, loading: mutateLoading, error: mutateError }"
+              >
                 <ApolloQuery
                   :query="require('../graphql/IsDirectoryPinned.gql')"
                   :variables="{ path: directoryLocation }"
@@ -73,11 +87,11 @@
                         :contrast="!pinResult.data.isDirectoryPinned"
                       />
                       {{
-                      pinResult.loading || mutateLoading
-                      ? ''
-                      : pinResult.data.isDirectoryPinned
-                      ? 'Unpin'
-                      : 'Pin'
+                        pinResult.loading || mutateLoading
+                          ? ''
+                          : pinResult.data.isDirectoryPinned
+                          ? 'Unpin'
+                          : 'Pin'
                       }}
                     </Button>
                     <p v-if="mutateError">
@@ -98,7 +112,10 @@
               :key="item.path"
               class="directory-item"
             >
-              <Button class="directory-item__button" @click="handleSelect(item)">
+              <Button
+                class="directory-item__button"
+                @click="handleSelect(item)"
+              >
                 <FolderIcon v-if="item.isDirectory" />
                 <ImageIcon v-else-if="item.isImage" />
                 <VideoIcon v-else-if="item.isVideo" />
@@ -121,6 +138,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import { DirectoryEntry } from '@i/DirectoryEntry';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
+
 import { CRZDataProxy } from '@/types/CRZDataProxy';
 import Button from '@/components/Button.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
@@ -132,6 +150,7 @@ import ImageIcon from '@/components/Icons/ImageIcon.vue';
 import VideoIcon from '@/components/Icons/VideoIcon.vue';
 import PinIcon from '@/components/Icons/PinIcon.vue';
 import BookIcon from '@/components/Icons/BookIcon.vue';
+import FilmIcon from '@/components/Icons/FilmIcon.vue';
 import Crumbs from '@/components/Crumbs.vue';
 import InputBox from '@/components/InputBox.vue';
 
@@ -147,6 +166,7 @@ import InputBox from '@/components/InputBox.vue';
     VideoIcon,
     PinIcon,
     BookIcon,
+    FilmIcon,
     Crumbs,
     InputBox
   },
@@ -197,6 +217,11 @@ export default class Directory extends Vue {
   private onReader() {
     const param = window.encodeURIComponent(this.directoryLocation);
     this.$router.push(`/gallery-reader?loc=${param}`);
+  }
+
+  private onReel() {
+    const param = window.encodeURIComponent(this.directoryLocation);
+    this.$router.push(`/reel-viewer?loc=${param}`);
   }
 }
 </script>
@@ -251,7 +276,7 @@ export default class Directory extends Vue {
 }
 
 .pin-button,
-.reader-button {
+.can-do-button {
   justify-content: space-evenly;
   min-height: 2.5rem;
   min-width: 100px;

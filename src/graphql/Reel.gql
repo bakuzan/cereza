@@ -1,0 +1,12 @@
+query Reel($path: String!) {
+  reel(path: $path) {
+    canReel
+    folderName
+    videos {
+      extension
+      fullName
+      name
+      url
+    }
+  }
+}

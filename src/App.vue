@@ -6,9 +6,7 @@
       </h1>
       <div class="flex-spacer"></div>
       <router-link class="app-header__link" to="/">Home</router-link>|
-      <router-link class="app-header__link" to="/settings"
-        >Settings</router-link
-      >
+      <router-link class="app-header__link" to="/settings">Settings</router-link>
     </nav>
     <main>
       <router-view />
@@ -162,6 +160,37 @@ a {
   }
 }
 
+input {
+  background-color: inherit;
+}
+
+.input-container {
+  flex: 1;
+  padding: 5px;
+  min-height: 35px;
+  box-sizing: content-box;
+
+  input[type='text'],
+  input[type='number'],
+  input[type='date'],
+  input[type='url'] {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  > button {
+    max-height: 32px;
+    margin: {
+      top: auto;
+      bottom: auto;
+    }
+  }
+}
+
+.has-float-label input:focus {
+  border-color: var(--accent-colour);
+}
+
 // General helpers...
 .flex {
   display: flex;
@@ -181,6 +210,8 @@ a {
 }
 
 .page {
+  min-height: calc(100vh - var(--header-height));
+
   &__title {
     font-size: 1.3rem;
     margin: 10px 0;

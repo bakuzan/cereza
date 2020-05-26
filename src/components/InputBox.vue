@@ -16,11 +16,7 @@
       @keydown="onKeyDown"
     />
     <label :for="id" class="input-box__label">{{ label }}</label>
-    <Button
-      v-show="showClearButton"
-      :class-name="clearClasses"
-      @click="clearAndFocusInput"
-    >
+    <Button v-show="showClearButton" :class-name="clearClasses" @click="clearAndFocusInput">
       <CrossIcon />
     </Button>
     <span v-show="showCount" class="input-box__count">{{ countText }}</span>
@@ -140,36 +136,7 @@ export default class InputBox extends Vue {
 }
 </script>
 
-<style lang="scss">
-input {
-  background-color: inherit;
-}
 
-.input-container {
-  flex: 1;
-  padding: 5px;
-  min-height: 35px;
-  box-sizing: content-box;
-  input[type='text'],
-  input[type='number'],
-  input[type='date'],
-  input[type='url'] {
-    width: 100%;
-    box-sizing: border-box;
-  }
-  > button {
-    max-height: 32px;
-    margin: {
-      top: auto;
-      bottom: auto;
-    }
-  }
-}
-
-.has-float-label input:focus {
-  border-color: var(--accent-colour);
-}
-</style>
 <style lang="scss" scoped>
 .input-box {
   &__label {

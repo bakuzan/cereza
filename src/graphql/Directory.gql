@@ -1,6 +1,7 @@
 query Directory($path: String!) {
   directory(path: $path) {
     canGallery
+    canReel
     entries {
       name
       path

@@ -3,6 +3,7 @@ import { promisify } from 'util';
 
 import { DirectoryArgs } from '@i/DirectoryArgs';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
+import { CRZVideo } from '@i/CRZVideo';
 import { pathToFolderName } from '../utils';
 import createResolver from '../utils/createResolver';
 
@@ -15,6 +16,7 @@ export default createResolver({
 
       return {
         canGallery: entries.every((x) => x.isImage),
+        canReel: entries.every((x) => x.isVideo),
         entries: entries.sort((a, b) =>
           a.isDirectory !== b.isDirectory
             ? b.isDirectory
@@ -28,8 +30,8 @@ export default createResolver({
       const entries = await context.readDirectory(args.path);
       const canGallery = entries.every((x) => x.isImage);
       const folderName = pathToFolderName(args.path);
-
       let images: string[] = [];
+
       if (canGallery) {
         images = await context.readImages(entries);
       }
@@ -38,6 +40,22 @@ export default createResolver({
         canGallery,
         folderName,
         images
+      };
+    },
+    async reel(_, args: DirectoryArgs, context) {
+      const entries = await context.readDirectory(args.path);
+      const canReel = entries.every((x) => x.isVideo);
+      const folderName = pathToFolderName(args.path);
+      let videos: CRZVideo[] = [];
+
+      if (canReel) {
+        videos = await context.readVideos(entries);
+      }
+
+      return {
+        canReel,
+        folderName,
+        videos
       };
     },
     async fileAction(

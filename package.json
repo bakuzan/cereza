@@ -63,7 +63,7 @@
     "pre-commit": "lint-staged"
   },
   "lint-staged": {
-    "*.{js,jsx,vue,ts,tsx}": [
+    "{,src,interfaces,apollo-server}/**/*.{js,jsx,vue,ts,tsx}": [
       "vue-cli-service lint --fix",
       "git add"
     ]

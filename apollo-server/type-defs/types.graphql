@@ -15,6 +15,7 @@ type DirectoryEntry {
 
 type DirectoryResponse {
   canGallery: Boolean
+  canReel: Boolean
   entries: [DirectoryEntry]!
 }
 
@@ -22,6 +23,19 @@ type GalleryResponse {
   canGallery: Boolean
   folderName: String
   images: [String]!
+}
+
+type CRZVideo {
+  fullName: String
+  name: String
+  extension: String
+  url: String
+}
+
+type ReelResponse {
+  canReel: Boolean
+  folderName: String
+  videos: [CRZVideo]!
 }
 
 # Db models
