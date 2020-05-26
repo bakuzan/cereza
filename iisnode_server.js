@@ -1,10 +1,26 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const execa = require('execa');
+const dotenv = require('dotenv');
+const server = require('vue-cli-plugin-apollo/graphql-server');
 
-async function init() {
-  await execa('npm run apollo:start').catch(() =>
-    console.log('CRZ: npm run apollo:start, Server failure.')
-  );
-}
+dotenv.config();
 
-init();
+const opts = {
+  host: 'localhost',
+  port: process.env.PORT,
+  graphqlPath: '/graphql',
+  subscriptionsPath: '/graphql',
+  enableMocks: false,
+  enableEngine: false,
+  typescript: true,
+  cors: '*',
+  timeout: 1000000,
+  quiet: false,
+  paths: {
+    typeDefs: require.resolve('./apollo-server/type-defs.ts'),
+    resolvers: require.resolve('./apollo-server/resolvers.ts'),
+    context: require.resolve('./apollo-server/context.ts'),
+    server: require.resolve('./apollo-server/server.ts'),
+    directives: require.resolve('./apollo-server/directives.ts')
+  }
+};
+
+server(opts, () => console.log('Cereza Server is running!'));
