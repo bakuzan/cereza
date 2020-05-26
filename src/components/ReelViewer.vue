@@ -262,7 +262,8 @@ $max-width: 100%;
   &__button {
     width: 100%;
 
-    &--active[disabled] {
+    &--active[disabled],
+    &--active[disabled]:hover {
       background-color: var(--accent-colour);
       color: var(--accent-contrast);
     }

@@ -6,7 +6,9 @@
       </h1>
       <div class="flex-spacer"></div>
       <router-link class="app-header__link" to="/">Home</router-link>|
-      <router-link class="app-header__link" to="/settings">Settings</router-link>
+      <router-link class="app-header__link" to="/settings"
+        >Settings</router-link
+      >
     </nav>
     <main>
       <router-view />

@@ -20,7 +20,14 @@ import { Component, Vue } from 'vue-property-decorator';
 import SelectBox, { SelectOption } from '@/components/SelectBox.vue';
 import { store } from '@/utils/localStorage';
 
-@Component({ components: { SelectBox } })
+@Component({
+  components: { SelectBox },
+  metaInfo() {
+    return {
+      title: 'Settings'
+    };
+  }
+})
 export default class Settings extends Vue {
   private readonly themeOptions: SelectOption[] = [
     { value: 'classic', text: 'Classic' },
