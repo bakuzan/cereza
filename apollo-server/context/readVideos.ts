@@ -1,7 +1,7 @@
 import { CRZVideo } from '@i/CRZVideo';
 import { DirectoryEntry } from '@i/DirectoryEntry';
 
-import { getPathExtension } from '../utils';
+import { getPathExtension, filterToFiles } from '../utils';
 import { obfuscate } from '../utils/obfuscate';
 
 const base = process.env.VUE_APP_GRAPHQL_HTTP || '';
@@ -11,9 +11,10 @@ const getVideoUrl = (url: string) =>
 export default async function readImages(
   entries: DirectoryEntry[]
 ): Promise<CRZVideo[]> {
+  const items = entries.filter(filterToFiles);
   const videos: CRZVideo[] = [];
 
-  for (const entry of entries) {
+  for (const entry of items) {
     const extension = getPathExtension(entry.path);
     const url = getVideoUrl(entry.path);
     const fullName = entry.name;

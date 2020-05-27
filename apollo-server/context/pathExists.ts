@@ -3,10 +3,9 @@ import { promisify } from 'util';
 
 const lstat = promisify(fs.lstat);
 
-export default async function isFile(location: string) {
+export default async function pathExists(location: string) {
   try {
-    const stats = await lstat(location);
-    return stats.isFile();
+    return await lstat(location).then(() => true);
   } catch {
     return false;
   }

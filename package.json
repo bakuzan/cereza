@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "serve": "npm run lint && vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build && node ./tools/moveIndexTemplate.js",
     "lint": "vue-cli-service lint --fix",
     "apollo": "vue-cli-service apollo:dev --generate-schema",
     "apollo:schema:generate": "vue-cli-service apollo:schema:generate",

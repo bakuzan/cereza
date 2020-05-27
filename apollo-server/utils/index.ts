@@ -1,5 +1,8 @@
 import path from 'path';
 
+import { DirectoryEntry } from '@i/DirectoryEntry';
+import { sysFiles } from '../constants';
+
 export const castStringToBool = (val: string | undefined) =>
   val === 'true' ? true : val === 'false' ? false : !!val;
 
@@ -10,3 +13,6 @@ export const getPathExtension = (filePath: string) =>
     .extname(filePath)
     .slice(1)
     .toLowerCase();
+
+export const filterToFiles = (x: DirectoryEntry) =>
+  x.isFile && !sysFiles.includes(x.name);

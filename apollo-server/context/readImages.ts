@@ -2,16 +2,17 @@ import fs from 'fs';
 import { promisify } from 'util';
 
 import { DirectoryEntry } from '@i/DirectoryEntry';
-import { getPathExtension } from '../utils';
+import { getPathExtension, filterToFiles } from '../utils';
 
 const readFile = promisify(fs.readFile);
 
 export default async function readImages(
   entries: DirectoryEntry[]
 ): Promise<string[]> {
+  const items = entries.filter(filterToFiles);
   const images: string[] = [];
 
-  for (const entry of entries) {
+  for (const entry of items) {
     const buff = await readFile(entry.path);
 
     const ext = getPathExtension(entry.path);

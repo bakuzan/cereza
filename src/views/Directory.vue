@@ -3,6 +3,11 @@
     <div class="directory__header">
       <h2 class="page__title">Directory</h2>
       <Crumbs :path="directoryLocation" @select="navigateTo" />
+      <div class="flex-spacer" />
+      <Button class="action-button" @click="onAction(directoryLocation)">
+        <FolderIcon />
+        <div class="action-button__name">Explorer</div>
+      </Button>
     </div>
     <ApolloQuery
       :query="require('../graphql/Directory.gql')"
@@ -11,11 +16,7 @@
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
 
-        <ErrorBlock
-          v-else-if="error"
-          :data="error"
-          message="Failed to fetch directory contents."
-        />
+        <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch directory contents." />
 
         <div v-else-if="data && data.directory" class="result apollo">
           <div class="flex flex--spaced directory__actions">
@@ -51,9 +52,7 @@
               :variables="{ path: directoryLocation }"
               @done="() => null"
             >
-              <template
-                v-slot="{ mutate, loading: mutateLoading, error: mutateError }"
-              >
+              <template v-slot="{ mutate, loading: mutateLoading, error: mutateError }">
                 <ApolloQuery
                   :query="require('../graphql/IsDirectoryPinned.gql')"
                   :variables="{ path: directoryLocation }"
@@ -87,11 +86,11 @@
                         :contrast="!pinResult.data.isDirectoryPinned"
                       />
                       {{
-                        pinResult.loading || mutateLoading
-                          ? ''
-                          : pinResult.data.isDirectoryPinned
-                          ? 'Unpin'
-                          : 'Pin'
+                      pinResult.loading || mutateLoading
+                      ? ''
+                      : pinResult.data.isDirectoryPinned
+                      ? 'Unpin'
+                      : 'Pin'
                       }}
                     </Button>
                     <p v-if="mutateError">
@@ -104,6 +103,10 @@
               </template>
             </ApolloMutation>
           </div>
+          <div class="result__count">
+            Showing {{ data.directory.entries.filter((x) => x.name.toLowerCase().includes(filter)).length }} of
+            {{ data.directory.entries.length }}
+          </div>
           <ul class="grid directory-list">
             <li
               v-for="item of data.directory.entries.filter((x) =>
@@ -112,10 +115,7 @@
               :key="item.path"
               class="directory-item"
             >
-              <Button
-                class="directory-item__button"
-                @click="handleSelect(item)"
-              >
+              <Button class="directory-item__button" @click="handleSelect(item)">
                 <FolderIcon v-if="item.isDirectory" />
                 <ImageIcon v-else-if="item.isImage" />
                 <VideoIcon v-else-if="item.isVideo" />
@@ -134,9 +134,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 
 import { DirectoryEntry } from '@i/DirectoryEntry';
+import { ApolloResponse } from '@i/ApolloResponse';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
 
 import { CRZDataProxy } from '@/types/CRZDataProxy';
@@ -179,25 +180,36 @@ import InputBox from '@/components/InputBox.vue';
 export default class Directory extends Vue {
   private filter = '';
 
+  @Watch('$route')
+  onRouteChange() {
+    this.filter = '';
+  }
+
   get directoryLocation() {
     const loc = this.$route.query['loc'];
     return (loc instanceof Array ? loc.pop() : loc) ?? '';
   }
 
-  private async handleSelect(item: DirectoryEntry) {
+  private handleSelect(item: DirectoryEntry) {
     if (item.isDirectory) {
       this.navigateTo(item.path);
     } else {
-      const result = await this.$apollo.query<ConfirmationResponse>({
-        fetchPolicy: 'network-only',
-        query: require('../graphql/FileAction.gql'),
-        variables: { path: item.path }
-      });
+      this.onAction(item.path);
+    }
+  }
 
-      if (!result.data.success) {
-        // TODO Handle error
-        console.error(result, item);
-      }
+  private async onAction(path: string) {
+    const result = await this.$apollo.query<
+      ApolloResponse<ConfirmationResponse>
+    >({
+      fetchPolicy: 'network-only',
+      query: require('../graphql/Action.gql'),
+      variables: { path }
+    });
+
+    if (!result.data?.action.success) {
+      // TODO Handle error
+      console.error(`Failed action @ ${path}`, result);
     }
   }
 
@@ -239,7 +251,19 @@ export default class Directory extends Vue {
   @include respondToAll((xxs, xs)) {
     &__actions {
       flex-wrap: wrap;
+      margin-bottom: 15px;
     }
+  }
+}
+
+.action-button,
+.directory-item__button {
+  border: 1px solid transparent;
+
+  &:focus,
+  &:hover,
+  &:active {
+    border-color: var(--accent-colour);
   }
 }
 
@@ -255,13 +279,10 @@ export default class Directory extends Vue {
 
   &__button {
     width: 100%;
-    border: 1px solid transparent;
 
     &:focus,
     &:hover,
     &:active {
-      border-color: var(--accent-colour);
-
       .directory-item__name {
         text-decoration: underline;
       }
@@ -293,11 +314,18 @@ export default class Directory extends Vue {
   }
 }
 
-.result.apollo {
-  margin: 10px 0;
+.result {
+  &.apollo {
+    margin: 10px 0;
 
-  @include respondToAll((xxs, xs)) {
-    margin: 20px 0;
+    @include respondToAll((xxs, xs)) {
+      margin: 20px 0;
+    }
+  }
+
+  &__count {
+    font-size: 0.75rem;
+    margin: 5px;
   }
 }
 
@@ -307,6 +335,7 @@ export default class Directory extends Vue {
 </style>
 
 <style lang="scss">
+.action-button,
 .directory-item__button {
   &:focus,
   &:hover,

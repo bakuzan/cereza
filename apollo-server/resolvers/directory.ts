@@ -15,8 +15,8 @@ export default createResolver({
       const entries = await context.readDirectory(args.path);
 
       return {
-        canGallery: entries.every((x) => x.isImage),
-        canReel: entries.every((x) => x.isVideo),
+        canGallery: context.canGallery(entries),
+        canReel: context.canReel(entries),
         entries: entries.sort((a, b) =>
           a.isDirectory !== b.isDirectory
             ? b.isDirectory
@@ -28,7 +28,7 @@ export default createResolver({
     },
     async gallery(_, args: DirectoryArgs, context) {
       const entries = await context.readDirectory(args.path);
-      const canGallery = entries.every((x) => x.isImage);
+      const canGallery = context.canGallery(entries);
       const folderName = pathToFolderName(args.path);
       let images: string[] = [];
 
@@ -44,7 +44,7 @@ export default createResolver({
     },
     async reel(_, args: DirectoryArgs, context) {
       const entries = await context.readDirectory(args.path);
-      const canReel = entries.every((x) => x.isVideo);
+      const canReel = context.canReel(entries);
       const folderName = pathToFolderName(args.path);
       let videos: CRZVideo[] = [];
 
@@ -58,24 +58,20 @@ export default createResolver({
         videos
       };
     },
-    async fileAction(
+    async action(
       _,
       args: DirectoryArgs,
       context
     ): Promise<ConfirmationResponse> {
-      const success = await context.isFile(args.path);
+      const success = await context.pathExists(args.path);
 
       if (success) {
-        await execProcess(`start "" ${args.path}`);
+        await execProcess(`start "" "${args.path}"`);
       }
 
       return {
         success,
-        errorMessages: success
-          ? []
-          : [
-              'Path either does not exist, or is not a file. Path must point to a file.'
-            ],
+        errorMessages: success ? [] : ['Path either does not exist.'],
         messages: []
       };
     }

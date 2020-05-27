@@ -17,8 +17,8 @@ type Query {
   "Fetch reel directory contents"
   reel(path: String!): ReelResponse
 
-  "Activate file default action"
-  fileAction(path: String!): ConfirmationResponse
+  "Activate path with default action"
+  action(path: String!): ConfirmationResponse
 
   "Fetch all pinned directories"
   allPinned: [Pinned]

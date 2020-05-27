@@ -6,9 +6,7 @@
       </h1>
       <div class="flex-spacer"></div>
       <router-link class="app-header__link" to="/">Home</router-link>|
-      <router-link class="app-header__link" to="/settings"
-        >Settings</router-link
-      >
+      <router-link class="app-header__link" to="/settings">Settings</router-link>
     </nav>
     <main>
       <router-view />
@@ -149,7 +147,6 @@ main {
   min-height: calc(100vh - var(--header-height) - 5px);
   padding: 5px;
   padding-top: calc(var(--header-height) + 5px);
-  overflow-x: hidden;
 }
 
 a {
@@ -234,8 +231,9 @@ $padding: 5px;
 .app-image {
   position: fixed;
   top: var(--header-height);
-  width: 100vw;
-  height: 100vh;
+  left: 0;
+  right: 0;
+  bottom: 0;
   opacity: 0.25;
   pointer-events: none;
   z-index: -1;

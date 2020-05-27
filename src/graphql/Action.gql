@@ -1,0 +1,6 @@
+query Action($path: String!) {
+  action(path: $path) {
+    success
+    errorMessages
+  }
+}
