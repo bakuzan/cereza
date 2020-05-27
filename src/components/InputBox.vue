@@ -5,8 +5,11 @@
       :type="type"
       :name="name"
       :value="value"
+      :min="min"
+      :max="max"
       :maxLength="maxLength"
       :disabled="disabled"
+      :autofocus="autoFocus"
       class="input-box__input"
       placeholder=" "
       autocomplete="off"
@@ -16,11 +19,7 @@
       @keydown="onKeyDown"
     />
     <label :for="id" class="input-box__label">{{ label }}</label>
-    <Button
-      v-show="showClearButton"
-      :class-name="clearClasses"
-      @click="clearAndFocusInput"
-    >
+    <Button v-show="showClearButton" :class-name="clearClasses" @click="clearAndFocusInput">
       <CrossIcon />
     </Button>
     <span v-show="showCount" class="input-box__count">{{ countText }}</span>
@@ -54,8 +53,10 @@ export default class InputBox extends Vue {
   @Prop({ default: '' }) readonly className!: string;
   @Prop({ default: '' }) readonly clearButtonClass!: string;
   @Prop({ default: undefined }) readonly maxLength: number | undefined;
+  @Prop({ default: undefined }) readonly min: number | undefined;
   @Prop({ default: undefined }) readonly max: number | undefined;
   @Prop({ default: false }) readonly disabled!: boolean;
+  @Prop({ default: false }) readonly autoFocus!: boolean;
 
   private clearTimer = 0;
 
@@ -68,7 +69,8 @@ export default class InputBox extends Vue {
   }
 
   get classes() {
-    const notClearable = !!this.isTextInput;
+    const notClearable = !this.isTextInput;
+
     return classNames(
       'input-box',
       'input-container',

@@ -57,6 +57,11 @@
               >Back to directory</Button
             >
           </div>
+
+          <GoToWidget
+            :max="data.gallery.images.length"
+            @submit="onGoToSubmit"
+          />
         </div>
 
         <div v-else class="no-result apollo"></div>
@@ -72,11 +77,12 @@ import Button from '@/components/Button.vue';
 import CrossIcon from '@/components/Icons/CrossIcon.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
 import LoadingBouncer from '@/components/LoadingBouncer.vue';
+import GoToWidget from '@/components/GoToWidget.vue';
 
 import scrollToAnchor from '@/utils/scrollToAnchor';
 
 @Component({
-  components: { Button, CrossIcon, ErrorBlock, LoadingBouncer },
+  components: { Button, CrossIcon, ErrorBlock, LoadingBouncer, GoToWidget },
   metaInfo() {
     return {
       title: 'Reader'
@@ -96,6 +102,11 @@ export default class Reader extends Vue {
   }
 
   // Methods
+  private onGoToSubmit(pageNumber: string) {
+    const loc = this.$route.query['loc'];
+    this.$router.replace(`${this.$route.path}?loc=${loc}#page_${pageNumber}`);
+  }
+
   private onCloseReader() {
     const param = window.encodeURIComponent(this.directoryLocation);
     this.$router.push(`/directory?loc=${param}`);

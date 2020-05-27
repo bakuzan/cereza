@@ -16,7 +16,11 @@
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
 
-        <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch directory contents." />
+        <ErrorBlock
+          v-else-if="error"
+          :data="error"
+          message="Failed to fetch directory contents."
+        />
 
         <div v-else-if="data && data.directory" class="result apollo">
           <div class="flex flex--spaced directory__actions">
@@ -52,7 +56,9 @@
               :variables="{ path: directoryLocation }"
               @done="() => null"
             >
-              <template v-slot="{ mutate, loading: mutateLoading, error: mutateError }">
+              <template
+                v-slot="{ mutate, loading: mutateLoading, error: mutateError }"
+              >
                 <ApolloQuery
                   :query="require('../graphql/IsDirectoryPinned.gql')"
                   :variables="{ path: directoryLocation }"
@@ -86,11 +92,11 @@
                         :contrast="!pinResult.data.isDirectoryPinned"
                       />
                       {{
-                      pinResult.loading || mutateLoading
-                      ? ''
-                      : pinResult.data.isDirectoryPinned
-                      ? 'Unpin'
-                      : 'Pin'
+                        pinResult.loading || mutateLoading
+                          ? ''
+                          : pinResult.data.isDirectoryPinned
+                          ? 'Unpin'
+                          : 'Pin'
                       }}
                     </Button>
                     <p v-if="mutateError">
@@ -104,7 +110,13 @@
             </ApolloMutation>
           </div>
           <div class="result__count">
-            Showing {{ data.directory.entries.filter((x) => x.name.toLowerCase().includes(filter)).length }} of
+            Showing
+            {{
+              data.directory.entries.filter((x) =>
+                x.name.toLowerCase().includes(filter)
+              ).length
+            }}
+            of
             {{ data.directory.entries.length }}
           </div>
           <ul class="grid directory-list">
@@ -115,11 +127,31 @@
               :key="item.path"
               class="directory-item"
             >
-              <Button class="directory-item__button" @click="handleSelect(item)">
-                <FolderIcon v-if="item.isDirectory" />
-                <ImageIcon v-else-if="item.isImage" />
-                <VideoIcon v-else-if="item.isVideo" />
-                <FileIcon v-else />
+              <Button
+                class="directory-item__button"
+                @click="handleSelect(item)"
+              >
+                <FolderIcon
+                  v-if="item.isDirectory"
+                  title="Folder"
+                  aria-label="Folder"
+                />
+                <ShortcutIcon
+                  v-else-if="item.isShortcut"
+                  title="Shortcut"
+                  aria-label="Shortcut"
+                />
+                <ImageIcon
+                  v-else-if="item.isImage"
+                  title="Image"
+                  aria-label="Image"
+                />
+                <VideoIcon
+                  v-else-if="item.isVideo"
+                  title="Video"
+                  aria-label="Video"
+                />
+                <FileIcon v-else title="File" aria-label="File" />
 
                 <div class="directory-item__name">{{ item.name }}</div>
               </Button>
@@ -152,6 +184,7 @@ import VideoIcon from '@/components/Icons/VideoIcon.vue';
 import PinIcon from '@/components/Icons/PinIcon.vue';
 import BookIcon from '@/components/Icons/BookIcon.vue';
 import FilmIcon from '@/components/Icons/FilmIcon.vue';
+import ShortcutIcon from '@/components/Icons/ShortcutIcon.vue';
 import Crumbs from '@/components/Crumbs.vue';
 import InputBox from '@/components/InputBox.vue';
 
@@ -168,6 +201,7 @@ import InputBox from '@/components/InputBox.vue';
     PinIcon,
     BookIcon,
     FilmIcon,
+    ShortcutIcon,
     Crumbs,
     InputBox
   },
