@@ -1,3 +1,4 @@
+import 'tsconfig-paths/register';
 import path from 'path';
 import { fileLoader, mergeResolvers } from 'merge-graphql-schemas';
 

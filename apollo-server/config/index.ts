@@ -31,7 +31,7 @@ function createMigrationContext(sequelize: Sequelize) {
     },
 
     logging: function() {
-      console.log.apply(null, arguments);
+      console.log.apply(null, arguments as any);
     }
   });
 
@@ -47,15 +47,13 @@ async function cmdStatus(umzug: Umzug.Umzug) {
   let executed = await umzug.executed();
   let pending = await umzug.pending();
 
-  executed = executed.map((m) => {
-    m['name'] = path.basename(m.file, '.js');
-    return m;
-  });
+  executed = executed.map((m) =>
+    Object.assign(m, 'name', path.basename(m.file, '.js'))
+  );
 
-  pending = pending.map((m) => {
-    m['name'] = path.basename(m.file, '.js');
-    return m;
-  });
+  pending = pending.map((m) =>
+    Object.assign(m, 'name', path.basename(m.file, '.js'))
+  );
 
   const current = executed.length > 0 ? executed[0].file : '<NO_MIGRATIONS>';
   const status = {

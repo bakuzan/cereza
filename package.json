@@ -10,7 +10,8 @@
     "apollo": "vue-cli-service apollo:dev --generate-schema",
     "apollo:schema:generate": "vue-cli-service apollo:schema:generate",
     "apollo:schema:publish": "vue-cli-service apollo:schema:publish",
-    "apollo:start": "vue-cli-service apollo:start"
+    "apollo:start": "vue-cli-service apollo:start",
+    "build:server": "tsc --project tsconfig.server.json"
   },
   "dependencies": {
     "classnames": "^2.2.6",
@@ -35,6 +36,8 @@
     "vue-router": "^3.1.6"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.8.3",
+    "@babel/plugin-proposal-optional-chaining": "^7.10.0",
     "@types/sequelize": "^4.28.8",
     "@types/umzug": "^2.2.3",
     "@typescript-eslint/eslint-plugin": "^2.26.0",
@@ -56,6 +59,7 @@
     "node-sass": "^4.12.0",
     "prettier": "^1.19.1",
     "sass-loader": "^8.0.2",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "~3.8.3",
     "vue-cli-plugin-apollo": "^0.21.3",
     "vue-template-compiler": "^2.6.11"

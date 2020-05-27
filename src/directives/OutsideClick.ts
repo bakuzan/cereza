@@ -1,16 +1,23 @@
-import Vue from 'vue';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import Vue, { DirectiveOptions } from 'vue';
 
 import addOutsideClick from '../utils/addOutsideClick';
 
-export const OutsideClick = {
-  acceptStatement: true,
-  bind(element: HTMLElement, binding: any, vnode: Vue.VNode) {
-    const vm = vnode.context as any;
-    vm.removeOutsideClick = addOutsideClick(element, binding.value);
+export const OutsideClick: DirectiveOptions = {
+  bind(element, binding, vnode) {
+    const vm = vnode.context as Vue;
+    Object.assign(
+      vm,
+      'removeOutsideClick',
+      addOutsideClick(element, binding.value)
+    );
   },
-  unbind(_: any, __: any, vnode: Vue.VNode) {
-    const vm = vnode.context as any;
-    vm.removeOutsideClick && vm.removeOutsideClick();
+  unbind(_, __, vnode) {
+    const vm = vnode.context as Vue;
+
+    if ('removeOutsideClick' in vm) {
+      (vm as any).removeOutsideClick();
+    }
   }
 };
 

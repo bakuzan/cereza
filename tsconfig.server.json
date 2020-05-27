@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "outDir": "./server",
+    "target": "es2019",
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
@@ -10,15 +11,15 @@
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "baseUrl": ".",
     "types": ["webpack-env", "vue-cli-plugin-apollo/types", "vue-apollo/types"],
     "paths": {
-      "@i/*": ["../interfaces/*"],
-      "#/*": ["./*"]
+      "@i/*": ["interfaces/*"],
+      "@s/*": ["apollo-server/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": ["./**/*.ts", "../interfaces/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["apollo-server/**/*.ts", "interfaces/**/*.ts"],
+  "exclude": ["node_modules", "src", "iisnode_server.js"]
 }

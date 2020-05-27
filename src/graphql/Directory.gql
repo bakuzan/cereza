@@ -9,6 +9,7 @@ query Directory($path: String!) {
       isFile
       isImage
       isVideo
+      isShortcut
     }
   }
 }

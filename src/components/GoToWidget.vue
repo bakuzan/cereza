@@ -1,6 +1,11 @@
 <template>
   <div v-if="showWidget" class="goto-widget" v-crz-outside-click="onClose">
-    <form name="goToForm" novalidate autocomplete="off" @submit.prevent="onGoToSubmit">
+    <form
+      name="goToForm"
+      novalidate
+      autocomplete="off"
+      @submit.prevent="onGoToSubmit"
+    >
       <InputBox
         type="number"
         id="goToPage"

@@ -15,8 +15,10 @@ export default async function readImages(
   const videos: CRZVideo[] = [];
 
   for (const entry of items) {
-    const extension = getPathExtension(entry.path);
-    const url = getVideoUrl(entry.path);
+    const filePath = entry.targetPath ?? entry.path;
+    const extension = getPathExtension(filePath);
+    const url = getVideoUrl(filePath);
+
     const fullName = entry.name;
     const name = fullName
       .split('.')

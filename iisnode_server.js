@@ -2,10 +2,6 @@ const dotenv = require('dotenv');
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 
-// eslint-disable-next-line no-global-assign
-require = require('esm')(module);
-require('ts-node/register/transpile-only');
-
 dotenv.config();
 
 const options = {
@@ -13,11 +9,11 @@ const options = {
   graphqlPath: '/graphql',
   cors: '*',
   paths: {
-    typeDefs: require.resolve('./apollo-server/type-defs.ts'),
-    resolvers: require.resolve('./apollo-server/resolvers.ts'),
-    context: require.resolve('./apollo-server/context.ts'),
-    server: require.resolve('./apollo-server/server.ts'),
-    directives: require.resolve('./apollo-server/directives.ts')
+    typeDefs: require.resolve('./server/apollo-server/type-defs.js'),
+    resolvers: require.resolve('./server/apollo-server/resolvers.js'),
+    context: require.resolve('./server/apollo-server/context.js'),
+    server: require.resolve('./server/apollo-server/server.js'),
+    directives: require.resolve('./server/apollo-server/directives.js')
   },
   serverOptions: {
     introspection: true,
@@ -80,10 +76,7 @@ app.listen(options.port, () => {
 
 function load(file) {
   const module = require(file);
-  if (module.default) {
-    return module.default;
-  }
-  return module;
+  return module.default ? module.default : module;
 }
 
 function processSchema(typeDefs) {
@@ -108,6 +101,7 @@ function removeFromSchema(document, kind, name) {
     (def) =>
       def.kind === kind && def.name.kind === 'Name' && def.name.value === name
   );
+
   if (index !== -1) {
     definitions.splice(index, 1);
   }

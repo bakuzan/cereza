@@ -5,7 +5,7 @@ import express from 'express';
 import { Environment } from './constants';
 import { streamVideo } from './stream';
 
-const distPath = path.resolve(__dirname, '../dist');
+const distPath = path.resolve(__dirname, '../../dist');
 
 export default (app: express.Application) => {
   app.use((req, _, next) => {
@@ -20,8 +20,12 @@ export default (app: express.Application) => {
 
   // Always return the main index.html, so router render the route in the client
   if (process.env.NODE_ENV === Environment.Production) {
+    app.use('index.html', (_, res) =>
+      res.sendFile(path.resolve(distPath, 'index.html'))
+    );
+
     app.get('*', (_, res) =>
-      res.sendFile(path.resolve(__dirname, '../dist', 'index.html'))
+      res.sendFile(path.resolve(distPath, 'index.html'))
     );
   }
 };

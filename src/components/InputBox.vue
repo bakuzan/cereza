@@ -19,7 +19,11 @@
       @keydown="onKeyDown"
     />
     <label :for="id" class="input-box__label">{{ label }}</label>
-    <Button v-show="showClearButton" :class-name="clearClasses" @click="clearAndFocusInput">
+    <Button
+      v-show="showClearButton"
+      :class-name="clearClasses"
+      @click="clearAndFocusInput"
+    >
       <CrossIcon />
     </Button>
     <span v-show="showCount" class="input-box__count">{{ countText }}</span>

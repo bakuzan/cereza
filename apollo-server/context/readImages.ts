@@ -13,9 +13,10 @@ export default async function readImages(
   const images: string[] = [];
 
   for (const entry of items) {
-    const buff = await readFile(entry.path);
+    const filePath = entry.targetPath ?? entry.path;
+    const buff = await readFile(filePath);
 
-    const ext = getPathExtension(entry.path);
+    const ext = getPathExtension(filePath);
     const image = Buffer.from(buff).toString('base64');
 
     images.push(`data:image/${ext};base64,${image}`);

@@ -26,3 +26,5 @@ yarn-error.log*
 # generated
 schema.graphql
 *.sqlite
+server/**/*
+!server/.gitkeep
