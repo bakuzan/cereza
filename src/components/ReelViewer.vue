@@ -199,11 +199,11 @@ $max-width: 100%;
   display: grid;
   gap: 5px;
   grid-auto-rows: minmax(500px, auto);
-  grid-template-columns: repeat(8, minmax(100px, 1fr));
-  grid-template-areas: 'vc vc vc vc vc vc vs vs';
+  grid-template-columns: repeat(9, minmax(100px, 1fr));
+  grid-template-areas: 'vc vc vc vc vc vc vs vs vs';
 
   @include respondToAll((xxs, xs)) {
-    grid-template-areas: 'vc vc vc vc vc vc vc vc' 'vs vs vs vs vs vs vs vs';
+    grid-template-areas: 'vc vc vc vc vc vc vc vc vc' 'vs vs vs vs vs vs vs vs vs';
   }
 
   &__content {
@@ -247,8 +247,11 @@ $max-width: 100%;
 }
 
 .videos {
-  padding-left: 5px;
   list-style-type: none;
+  max-height: calc(100vh - (var(--header-height) * 2));
+  padding: 0;
+  margin: 0;
+  overflow: auto;
 
   &__item {
     border: 1px solid transparent;

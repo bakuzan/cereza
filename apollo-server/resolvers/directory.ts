@@ -7,7 +7,7 @@ import { CRZVideo } from '@i/CRZVideo';
 import { pathToFolderName } from '@s/utils';
 import createResolver from '@s/utils/createResolver';
 
-const execProcess = promisify(child.exec);
+const spawnAsync = promisify(child.spawn);
 
 export default createResolver({
   Query: {
@@ -66,12 +66,23 @@ export default createResolver({
       const success = await context.pathExists(args.path);
 
       if (success) {
-        await execProcess(`start "" "${args.path}"`);
+        const subprocess = await spawnAsync(
+          'cmd.exe',
+          ['/s', '/c', 'start', '""', '/b', `"${args.path}"`],
+          {
+            detached: true,
+            windowsHide: false,
+            windowsVerbatimArguments: true
+          }
+        );
+
+        const subp = subprocess as child.ChildProcessWithoutNullStreams;
+        subp.unref();
       }
 
       return {
         success,
-        errorMessages: success ? [] : ['Path either does not exist.'],
+        errorMessages: success ? [] : ['Path does not exist.'],
         messages: []
       };
     }

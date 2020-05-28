@@ -8,6 +8,7 @@ web.config
 .env
 .env.local
 .env.*.local
+.env_*
 
 # Log files
 npm-debug.log*

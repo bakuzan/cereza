@@ -3,7 +3,13 @@ import path from 'path';
 import { promisify } from 'util';
 
 import { DirectoryEntry } from '@i/DirectoryEntry';
-import { isImage, isShortcut, isVideo } from './checkFileType';
+import {
+  isImage,
+  isShortcut,
+  isVideo,
+  isFile,
+  isDirectory
+} from './checkFileType';
 import getShortcutTargetPath from '@s/utils/getShortcutTargetPath';
 
 const readdir = promisify(fs.readdir);
@@ -11,7 +17,15 @@ const readdir = promisify(fs.readdir);
 export default async function readDirectory(
   directoryPath: string
 ): Promise<DirectoryEntry[]> {
-  const systemPath = path.resolve(path.join(directoryPath, '\\'));
+  let systemPath = path.resolve(path.join(directoryPath, '\\'));
+
+  if (isShortcut(systemPath)) {
+    const result = await getShortcutTargetPath([systemPath]);
+
+    if (result.success) {
+      systemPath = result.items.pop()?.targetPath ?? systemPath;
+    }
+  }
 
   const items = await readdir(systemPath, {
     encoding: 'utf-8',
@@ -19,7 +33,7 @@ export default async function readDirectory(
   });
 
   let entries: DirectoryEntry[] = items.map((x) => {
-    const fullName = path.join(directoryPath, x.name);
+    const fullName = path.join(systemPath, x.name);
     const parentName = path.basename(path.dirname(fullName));
 
     return {
@@ -48,6 +62,8 @@ export default async function readDirectory(
 
         return {
           ...x,
+          isDirectory: targetPath ? isDirectory(targetPath) : x.isDirectory,
+          isFile: targetPath ? isFile(targetPath) : x.isFile,
           isImage: targetPath ? isImage(targetPath) : x.isImage,
           isVideo: targetPath ? isVideo(targetPath) : x.isVideo,
           targetPath

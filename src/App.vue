@@ -146,9 +146,10 @@ input {
 }
 
 main {
-  min-height: calc(100vh - var(--header-height) - 5px);
-  padding: 5px;
-  padding-top: calc(var(--header-height) + 5px);
+  $padding: 5px;
+  min-height: calc(100vh - var(--header-height) - #{$padding * 2});
+  padding: $padding;
+  padding-top: calc(var(--header-height) + #{$padding});
 }
 
 a {
@@ -211,7 +212,7 @@ input {
 }
 
 .page {
-  min-height: calc(100vh - var(--header-height));
+  min-height: calc(100vh - var(--header-height) - 5px);
 
   &__title {
     font-size: 1.3rem;

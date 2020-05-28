@@ -81,6 +81,7 @@ export default class Reel extends Vue {
 .reel {
   background: var(--base-colour);
   color: var(--contrast-colour);
+  padding-bottom: 5px;
   margin: -5px;
 
   .page__title {

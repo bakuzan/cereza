@@ -8,7 +8,7 @@ const base = process.env.VUE_APP_GRAPHQL_HTTP || '';
 const getVideoUrl = (url: string) =>
   `${base.replace('/graphql', '')}/video/${obfuscate(url)}`;
 
-export default async function readImages(
+export default async function readVideos(
   entries: DirectoryEntry[]
 ): Promise<CRZVideo[]> {
   const items = entries.filter(filterToFiles);
@@ -33,5 +33,5 @@ export default async function readImages(
     });
   }
 
-  return videos;
+  return videos.sort((a, b) => a.name.localeCompare(b.name));
 }

@@ -16,3 +16,6 @@ const checkExtensionIsIn = (extensions: Set<string>) => (filePath: string) =>
 export const isImage = checkExtensionIsIn(imgExts);
 export const isVideo = checkExtensionIsIn(vidExts);
 export const isShortcut = checkExtensionIsIn(new Set(['lnk']));
+
+export const isDirectory = (filePath: string) => path.extname(filePath) === '';
+export const isFile = (filePath: string) => path.extname(filePath) !== '';
