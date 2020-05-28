@@ -11,7 +11,7 @@
     "apollo:schema:generate": "vue-cli-service apollo:schema:generate",
     "apollo:schema:publish": "vue-cli-service apollo:schema:publish",
     "apollo:start": "vue-cli-service apollo:start",
-    "build:server": "tsc --project tsconfig.server.json"
+    "build:server": "tsc --project tsconfig.server.json && node ./tools/copyServerFiles.js"
   },
   "dependencies": {
     "classnames": "^2.2.6",
@@ -20,6 +20,7 @@
     "graphql-type-json": "^0.2.1",
     "image-extensions": "^1.1.0",
     "merge-graphql-schemas": "^1.7.8",
+    "module-alias": "^2.2.2",
     "reflect-metadata": "^0.1.13",
     "register-service-worker": "^1.7.1",
     "sequelize": "^5.21.8",
@@ -50,6 +51,7 @@
     "@vue/cli-service": "~4.3.0",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^5.0.2",
+    "cpy": "^8.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-graphql": "^2.1.1",
     "eslint-plugin-prettier": "^3.1.1",

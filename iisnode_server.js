@@ -1,19 +1,24 @@
-const dotenv = require('dotenv');
-const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
+const express = require('express');
+const dotenv = require('dotenv');
+const moduleAlias = require('module-alias');
+const path = require('path');
 
 dotenv.config();
+moduleAlias.addAlias('@s', path.resolve(__dirname, './server/apollo-server'));
+
+console.log('Starting...', require.resolve('@s/context.js'));
 
 const options = {
   port: process.env.PORT,
   graphqlPath: '/graphql',
   cors: '*',
   paths: {
-    typeDefs: require.resolve('./server/apollo-server/type-defs.js'),
-    resolvers: require.resolve('./server/apollo-server/resolvers.js'),
-    context: require.resolve('./server/apollo-server/context.js'),
-    server: require.resolve('./server/apollo-server/server.js'),
-    directives: require.resolve('./server/apollo-server/directives.js')
+    typeDefs: require.resolve('@s/type-defs.js'),
+    resolvers: require.resolve('@s/resolvers.js'),
+    context: require.resolve('@s/context.js'),
+    server: require.resolve('@s/server.js'),
+    directives: require.resolve('@s/directives.js')
   },
   serverOptions: {
     introspection: true,

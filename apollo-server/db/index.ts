@@ -8,7 +8,10 @@ import { castStringToBool } from '../utils';
 const db = new Sequelize(appName, '', undefined, {
   dialect: 'sqlite',
   storage: `${process.env.DB_STORAGE_PATH}${appName}.${process.env.NODE_ENV}.sqlite`,
-  models: [path.join(__dirname, './**/*.model.ts')],
+  models: [
+    path.join(__dirname, './**/*.model.ts'), // Dev
+    path.join(__dirname, './**/*.model.js') // Prod
+  ],
   modelMatch: (filename, member) =>
     filename.substring(0, filename.indexOf('.model')) === member.toLowerCase()
 });

@@ -4,8 +4,8 @@ import { promisify } from 'util';
 import { DirectoryArgs } from '@i/DirectoryArgs';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
 import { CRZVideo } from '@i/CRZVideo';
-import { pathToFolderName } from '../utils';
-import createResolver from '../utils/createResolver';
+import { pathToFolderName } from '@s/utils';
+import createResolver from '@s/utils/createResolver';
 
 const execProcess = promisify(child.exec);
 

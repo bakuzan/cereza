@@ -1,15 +1,13 @@
 import child from 'child_process';
+import fs from 'fs';
 import path from 'path';
 import { promisify } from 'util';
 
 const execProcess = promisify(child.exec);
+const unlinkAsync = promisify(fs.unlink);
+const writeFileAsync = promisify(fs.writeFile);
 
-function getCommand(lnkFile: string) {
-  const normalizedFile = path.normalize(path.resolve(lnkFile));
-  const getCOM = `(New-Object -COM WScript.Shell)`;
-
-  return `${getCOM}.CreateShortcut('${normalizedFile}').TargetPath;`;
-}
+const tempFile = path.resolve(__dirname, './file.txt');
 
 export default async function getShortcutTargetPath(
   lnkFile: string | string[]
@@ -33,11 +31,22 @@ export default async function getShortcutTargetPath(
   }
 
   const lnkFiles = typeof lnkFile === 'string' ? [lnkFile] : lnkFile;
-  const commands = lnkFiles.map((lnk) => getCommand(lnk));
+  const normalizedPath = lnkFiles
+    .map((lnk) => path.normalize(path.resolve(lnk)))
+    .join('\r\n');
 
+  // Put shortcuts args in file
+  await writeFileAsync(tempFile, normalizedPath);
+
+  // Read file and loop
+  const getTargetPath = `(New-Object -COM WScript.Shell).CreateShortcut($line).TargetPath;`;
+  const loopPaths = `foreach($line in Get-Content ${tempFile}) {${getTargetPath}}`;
   const { stdout, stderr } = await execProcess(
-    `powershell.exe -command "${commands.join('')}"`
+    `powershell.exe -command ${loopPaths}`
   );
+
+  // Remove file
+  await unlinkAsync(tempFile);
 
   if (stderr) {
     return {

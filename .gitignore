@@ -28,3 +28,4 @@ schema.graphql
 *.sqlite
 server/**/*
 !server/.gitkeep
+apollo-server/**/*.txt

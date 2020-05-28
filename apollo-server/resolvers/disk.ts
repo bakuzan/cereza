@@ -3,7 +3,7 @@ import child from 'child_process';
 import { promisify } from 'util';
 
 import { Disk } from '@i/Disk';
-import createResolver from '../utils/createResolver';
+import createResolver from '@s/utils/createResolver';
 
 const execProcess = promisify(child.exec);
 

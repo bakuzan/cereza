@@ -1,8 +1,13 @@
 {
   "compilerOptions": {
     "outDir": "./server",
-    "target": "es2019",
-    "module": "esnext",
+    "target": "es2015",
+    "module": "commonjs",
+    "alwaysStrict": true,
+    "declaration": false,
+    "pretty": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,

@@ -11,11 +11,17 @@ const combined = mergeTypes(typeDefs, {
 });
 
 // Required in dev to create/update schema.graphql
-if (process.env.NODE_ENV === Environment.Development) {
-  writeFileSync(
-    path.join(__dirname, '../node_modules/.temp/graphql', 'schema.graphql'),
-    combined
-  );
-}
+const pathPart =
+  process.env.NODE_ENV === Environment.Development ? '../' : '../../';
+
+writeFileSync(
+  path.join(
+    __dirname,
+    pathPart,
+    'node_modules/.temp/graphql',
+    'schema.graphql'
+  ),
+  combined
+);
 
 export default combined;

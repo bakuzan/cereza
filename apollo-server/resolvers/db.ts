@@ -1,8 +1,8 @@
 import { PinnedArgs } from '@i/PinnedArgs';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
 
-import { pathToFolderName } from '../utils';
-import createResolver from '../utils/createResolver';
+import { pathToFolderName } from '@s/utils';
+import createResolver from '@s/utils/createResolver';
 
 export default createResolver({
   Query: {
