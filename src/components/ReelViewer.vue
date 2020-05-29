@@ -103,7 +103,6 @@ export default class ReelViewer extends Vue {
   @Prop({ default: [] }) readonly data!: CRZVideo[];
 
   private autoCycle = false;
-  private activeVideo: CRZVideo | null = null;
   private destroyListeners: (() => void) | null = null;
   private meta = { ...defaultMeta };
 
@@ -115,10 +114,23 @@ export default class ReelViewer extends Vue {
   }
 
   // Computed
+  get selected() {
+    const selected = this.$route.query['selected'];
+    return (selected instanceof Array ? selected.pop() : selected) ?? '';
+  }
+
   get activeIndex() {
     return this.data.findIndex(
-      (x) => this.activeVideo && x.fullName === this.activeVideo.fullName
+      (x) => this.selected && x.fullName === this.selected
     );
+  }
+
+  get activeVideo() {
+    if (this.activeIndex === -1) {
+      return null;
+    }
+
+    return this.data[this.activeIndex] ?? null;
   }
 
   // Methods
@@ -143,10 +155,21 @@ export default class ReelViewer extends Vue {
 
   private onAutoCycle() {
     this.autoCycle = !this.autoCycle;
+
+    if (this.autoCycle && this.destroyListeners === null) {
+      this.setupListeners();
+    }
   }
 
   private onVideoSelect(item: CRZVideo) {
-    this.activeVideo = item;
+    this.$router.replace({
+      name: 'Reel',
+      query: {
+        ...this.$route.query,
+        selected: item.fullName
+      }
+    });
+
     this.meta = { ...defaultMeta };
     this.setupListeners();
   }
