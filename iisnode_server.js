@@ -34,7 +34,13 @@ const options = {
 };
 
 // Express app
+const distPath = path.resolve(__dirname, '../../dist');
 const app = express();
+
+// Prevent service worker from caching the index.html file in the public folder...
+app.get('/index.html', (_, res) =>
+  res.sendFile(path.resolve(distPath, 'index.html'))
+);
 
 // Customize those files
 const typeDefs = load(options.paths.typeDefs);

@@ -19,7 +19,12 @@
           :type="`video/${activeVideo.extension}`"
         ></video>
       </div>
-      <h3 class="video__name">{{ activeVideo ? activeVideo.name : '' }}</h3>
+      <h3 class="video__name">
+        {{ activeVideo ? activeVideo.name : '' }}
+        <div class="video__playback-speed">
+          ({{ meta.playbackSpeed }}x speed)
+        </div>
+      </h3>
       <div class="video__controls controls">
         <Tickbox
           id="autoCycle"
@@ -89,11 +94,13 @@ import ArrowLeft from '@/components/Icons/ArrowLeft.vue';
 import ArrowRight from '@/components/Icons/ArrowRight.vue';
 import RandomIcon from '@/components/Icons/RandomIcon.vue';
 import { getRandomInt } from '@/utils/random';
+import initReelControls from '@/utils/userControls/reel';
 
 const DURATION_CAP_SECONDS = 6;
 
 const defaultMeta = {
-  played: 0
+  played: 0,
+  playbackSpeed: 1
 };
 
 @Component({
@@ -104,12 +111,25 @@ export default class ReelViewer extends Vue {
 
   private autoCycle = false;
   private destroyListeners: (() => void) | null = null;
+  private removeControls: (() => void) | null = null;
   private meta = { ...defaultMeta };
 
   // Lifecycle
+  mounted() {
+    this.removeControls = initReelControls({
+      onPlaybackSpeedChange: (speed: number) =>
+        (this.meta.playbackSpeed = speed),
+      selector: '#videoPlayer'
+    });
+  }
+
   beforeDestroy() {
     if (this.destroyListeners) {
       this.destroyListeners();
+    }
+
+    if (this.removeControls) {
+      this.removeControls();
     }
   }
 
@@ -254,6 +274,13 @@ $max-width: 100%;
   &__controls {
     padding: 5px;
     margin: 10px 0;
+  }
+
+  &__playback-speed {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: lighter;
+    margin: 0 5px;
   }
 
   &__controls {

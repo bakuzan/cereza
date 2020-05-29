@@ -1,3 +1,5 @@
+import { EventKey } from '@/constants';
+
 function createListeners(name: string, cb: EventListenerOrEventListenerObject) {
   window.addEventListener(name, cb);
   return () => window.removeEventListener(name, cb);
@@ -18,7 +20,7 @@ export default function addOutsideClick(
   function handleKeyDown(event: Event) {
     const e = event as KeyboardEvent;
 
-    if ('Escape' === e.key) {
+    if (e.key === EventKey.Escape) {
       onOutsideClick(event);
     }
   }

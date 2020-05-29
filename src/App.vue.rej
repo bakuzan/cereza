@@ -1,6 +1,0 @@
-diff a/src/App.vue b/src/App.vue	(rejected hunks)
-@@ -9 +9,3 @@
--      <router-link class="app-header__link" to="/settings">Settings</router-link>
-+      <router-link class="app-header__link" to="/settings"
-+        >Settings</router-link
-+      >

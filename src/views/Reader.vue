@@ -25,7 +25,11 @@
               <CrossIcon />
             </Button>
           </div>
-          <div v-if="data.gallery.canGallery" class="reader-pane">
+          <div
+            v-if="data.gallery.canGallery"
+            class="reader-pane"
+            v-crz-on-top="onPageTop"
+          >
             <div
               v-for="(image, index) of data.gallery.images"
               :key="index"
@@ -79,10 +83,13 @@ import ErrorBlock from '@/components/ErrorBlock.vue';
 import LoadingBouncer from '@/components/LoadingBouncer.vue';
 import GoToWidget from '@/components/GoToWidget.vue';
 
+import { OnTop } from '@/directives/OnTop';
 import scrollToAnchor from '@/utils/scrollToAnchor';
+import initReaderControls from '@/utils/userControls/reader';
 
 @Component({
   components: { Button, CrossIcon, ErrorBlock, LoadingBouncer, GoToWidget },
+  directives: { OnTop },
   metaInfo() {
     return {
       title: 'Reader'
@@ -90,9 +97,19 @@ import scrollToAnchor from '@/utils/scrollToAnchor';
   }
 })
 export default class Reader extends Vue {
+  private removeControls: (() => void) | null = null;
+
   // Lifecycle
   mounted() {
     scrollToAnchor('#reader', -55);
+    this.removeControls = initReaderControls(this);
+  }
+
+  beforeDestroy() {
+    console.log('destroy..?');
+    if (this.removeControls) {
+      this.removeControls();
+    }
   }
 
   // Computed
@@ -110,6 +127,21 @@ export default class Reader extends Vue {
   private onCloseReader() {
     const param = window.encodeURIComponent(this.directoryLocation);
     this.$router.push(`/directory?loc=${param}`);
+  }
+
+  private onPageTop(hash: string) {
+    if (this.$route.hash === hash) {
+      return;
+    }
+
+    this.$router.replace({
+      hash,
+      name: 'Reader',
+      query: {
+        ...this.$route.query,
+        scroll: 'false'
+      }
+    });
   }
 }
 </script>

@@ -21,6 +21,7 @@ export default class ScrollTopButton extends Vue {
   @Prop({ default: 100 }) readonly offset!: number;
 
   private position = 0;
+  private timer = 0;
   private unlisten: () => void = () => null;
 
   //Lifecycle
@@ -50,9 +51,12 @@ export default class ScrollTopButton extends Vue {
     const handleScroll = () => {
       const value = getWindowScrollPosition();
 
-      if (value !== this.position) {
-        this.position = value;
-      }
+      clearTimeout(this.timer);
+      this.timer = window.setTimeout(() => {
+        if (value !== this.position) {
+          this.position = value;
+        }
+      }, 250);
     };
 
     window.addEventListener('scroll', handleScroll);

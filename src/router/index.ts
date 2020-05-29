@@ -48,11 +48,13 @@ const router = new VueRouter({
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (to.hash) {
-      return new Promise((resolve) =>
-        window.setTimeout(() => {
-          resolve({ selector: to.hash });
-        }, 1000)
-      );
+      const allowAnchorScroll = to.query.scroll !== 'false';
+
+      if (allowAnchorScroll) {
+        return new Promise((resolve) =>
+          window.setTimeout(() => resolve({ selector: to.hash }), 1000)
+        );
+      }
     } else if (savedPosition) {
       return savedPosition;
     } else {

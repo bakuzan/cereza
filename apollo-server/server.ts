@@ -23,10 +23,6 @@ export default (app: express.Application) => {
 
   // Always return the main index.html, so router render the route in the client
   if (process.env.NODE_ENV === Environment.Production) {
-    app.get('/index.html', (_, res) =>
-      res.sendFile(path.resolve(distPath, 'index.html'))
-    );
-
     app.get('*', (_, res) =>
       res.sendFile(path.resolve(distPath, 'index.html'))
     );

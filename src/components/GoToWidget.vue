@@ -26,6 +26,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import InputBox from '@/components/InputBox.vue';
 import { OutsideClick } from '@/directives/OutsideClick';
+import { EventKey } from '@/constants';
 
 @Component({ components: { InputBox }, directives: { OutsideClick } })
 export default class GoToWidget extends Vue {
@@ -49,7 +50,8 @@ export default class GoToWidget extends Vue {
 
   // Methods
   private onKeyPress(event: KeyboardEvent) {
-    if (event.code === 'KeyG' && !this.showWidget) {
+    console.log('key press...', event, this.showWidget);
+    if (event.key === EventKey.KeyG && !this.showWidget) {
       this.showWidget = true;
       requestAnimationFrame(() => this.$el.querySelector('input')?.focus());
     }
