@@ -16,6 +16,14 @@ export default (app: express.Application) => {
     next();
   });
 
+  // Prevent service worker from caching the index.html file in the public folder...
+  if (process.env.NODE_ENV === Environment.Production) {
+    app.get('/index.html', (_, res) => {
+      console.log('called /index.html...sendin dist index.html');
+      res.sendFile(path.resolve(distPath, 'index.html'));
+    });
+  }
+
   app.use(express.static(distPath));
 
   // Streaming

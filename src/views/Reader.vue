@@ -106,7 +106,6 @@ export default class Reader extends Vue {
   }
 
   beforeDestroy() {
-    console.log('destroy..?');
     if (this.removeControls) {
       this.removeControls();
     }
@@ -150,7 +149,9 @@ export default class Reader extends Vue {
 .reader {
   background: var(--base-colour);
   color: var(--contrast-colour);
+  padding-top: var(--header-height);
   margin: -5px;
+  margin-top: calc(-5px - var(--header-height));
   z-index: 10;
 
   .page__title {

@@ -50,7 +50,6 @@ export default class GoToWidget extends Vue {
 
   // Methods
   private onKeyPress(event: KeyboardEvent) {
-    console.log('key press...', event, this.showWidget);
     if (event.key === EventKey.KeyG && !this.showWidget) {
       this.showWidget = true;
       requestAnimationFrame(() => this.$el.querySelector('input')?.focus());

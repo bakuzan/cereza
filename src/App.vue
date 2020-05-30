@@ -1,15 +1,6 @@
 <template>
   <div :class="appClasses">
-    <nav class="app-header">
-      <h1 class="app-title">
-        <router-link class="app-title__link" to="/">Cereza</router-link>
-      </h1>
-      <div class="flex-spacer"></div>
-      <router-link class="app-header__link" to="/">Home</router-link>|
-      <router-link class="app-header__link" to="/settings"
-        >Settings</router-link
-      >
-    </nav>
+    <Header />
     <main>
       <router-view />
       <div class="app-image"></div>
@@ -22,11 +13,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 import classNames from 'classnames';
 
+import Header from '@/components/Header.vue';
 import ScrollTopButton from '@/components/ScrollTopButton.vue';
 import { store } from '@/utils/localStorage';
 
 @Component({
-  components: { ScrollTopButton },
+  components: { Header, ScrollTopButton },
   metaInfo() {
     return {
       titleTemplate: (value) => (value ? `${value} | Cereza` : 'Cereza'),
@@ -229,8 +221,6 @@ input {
 </style>
 
 <style lang="scss" scoped>
-$padding: 5px;
-
 .app-image {
   position: fixed;
   top: var(--header-height);
@@ -240,40 +230,5 @@ $padding: 5px;
   opacity: 0.25;
   pointer-events: none;
   z-index: -1;
-}
-
-.app-header {
-  position: fixed;
-  display: flex;
-  align-items: center;
-  height: calc(var(--header-height) - #{$padding * 2});
-  width: calc(100% - #{$padding * 2});
-  padding: $padding;
-  background-color: var(--base-colour);
-  color: var(--contrast-colour);
-  box-shadow: 0px 0px 5px 3px var(--accent-colour);
-  z-index: 1000;
-
-  &__link {
-    color: var(--contrast-colour);
-
-    &.router-link-exact-active {
-      color: var(--accent-colour);
-    }
-  }
-}
-
-.app-title {
-  margin: 0 5px;
-
-  &__link,
-  &__link:hover {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  &__link:hover {
-    color: var(--accent-colour);
-  }
 }
 </style>

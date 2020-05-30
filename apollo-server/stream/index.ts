@@ -10,6 +10,8 @@ export function streamVideo(req: Request, res: Response) {
   const videoPath = deobfuscate(key);
   const videoExt = getPathExtension(videoPath);
 
+  console.log(`Stream: ${videoPath}, video/${videoExt}`);
+
   const stat = fs.statSync(videoPath);
   const fileSize = stat.size;
   const range = req.headers.range;

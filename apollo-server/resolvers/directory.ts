@@ -1,13 +1,10 @@
 import child from 'child_process';
-import { promisify } from 'util';
 
 import { DirectoryArgs } from '@i/DirectoryArgs';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
 import { CRZVideo } from '@i/CRZVideo';
 import { pathToFolderName } from '@s/utils';
 import createResolver from '@s/utils/createResolver';
-
-const spawnAsync = promisify(child.spawn);
 
 export default createResolver({
   Query: {
@@ -66,18 +63,18 @@ export default createResolver({
       const success = await context.pathExists(args.path);
 
       if (success) {
-        const subprocess = await spawnAsync(
+        const subprocess = child.spawn(
           'cmd.exe',
           ['/s', '/c', 'start', '""', '/b', `"${args.path}"`],
           {
             detached: true,
+            stdio: 'ignore',
             windowsHide: false,
             windowsVerbatimArguments: true
           }
         );
 
-        const subp = subprocess as child.ChildProcessWithoutNullStreams;
-        subp.unref();
+        subprocess.unref();
       }
 
       return {

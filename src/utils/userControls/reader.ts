@@ -5,7 +5,6 @@ type RemoveListener = () => void;
 export default function initReaderControls<T extends Vue>(
   component: T
 ): RemoveListener {
-  console.log('init reader', component);
   function onKeyPress(event: KeyboardEvent) {
     const currentHash = component.$route.hash;
     const currentPage = currentHash ? Number(currentHash.split('_').pop()) : 1;
