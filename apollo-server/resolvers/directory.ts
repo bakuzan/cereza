@@ -62,24 +62,27 @@ export default createResolver({
     ): Promise<ConfirmationResponse> {
       const success = await context.pathExists(args.path);
 
-      if (success) {
-        const subprocess = child.spawn(
-          'cmd.exe',
-          ['/s', '/c', 'start', '""', '/b', `"${args.path}"`],
-          {
-            detached: true,
-            stdio: 'ignore',
-            windowsHide: false,
-            windowsVerbatimArguments: true
-          }
-        );
-
-        subprocess.unref();
+      if (!success) {
+        return {
+          success,
+          errorMessages: ['Path does not exist.'],
+          messages: []
+        };
       }
 
+      const cmdArgs = ['/s', '/c', 'start', '""', '/b', `"${args.path}"`];
+      const cmdOpts: Partial<child.SpawnOptions> = {
+        detached: true,
+        env: process.env,
+        stdio: 'ignore',
+        windowsVerbatimArguments: true
+      };
+
+      child.spawn('cmd.exe', cmdArgs, cmdOpts).unref();
+
       return {
-        success,
-        errorMessages: success ? [] : ['Path does not exist.'],
+        success: true,
+        errorMessages: [],
         messages: []
       };
     }

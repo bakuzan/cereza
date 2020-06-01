@@ -17,22 +17,12 @@ const options = {
     context: require.resolve('@s/context.js'),
     server: require.resolve('@s/server.js'),
     directives: require.resolve('@s/directives.js')
-  },
-  serverOptions: {
-    introspection: true,
-    playground: {
-      settings: {
-        'editor.cursorShape': 'block',
-        'editor.fontSize': 16,
-        'editor.fontFamily': '"Lucida Console", Consolas, monospace',
-        'editor.theme': 'light'
-      }
-    }
   }
 };
 
 // Express app
 const app = express();
+app.get('/', (_, res) => res.redirect(`/cereza`));
 
 // Customize those files
 const typeDefs = load(options.paths.typeDefs);
@@ -58,7 +48,15 @@ const server = new ApolloServer({
   cacheControl: true,
   engine: true,
   context,
-  ...options.serverOptions
+  introspection: true,
+  playground: {
+    settings: {
+      'editor.cursorShape': 'block',
+      'editor.fontSize': 16,
+      'editor.fontFamily': '"Lucida Console", Consolas, monospace',
+      'editor.theme': 'light'
+    }
+  }
 });
 
 // Express middleware

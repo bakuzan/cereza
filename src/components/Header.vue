@@ -19,20 +19,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { Route } from 'vue-router';
 import classNames from 'classnames';
 
-import ScrollTopButton from '@/components/ScrollTopButton.vue';
-import { store } from '@/utils/localStorage';
-
-@Component({
-  components: { ScrollTopButton },
-  metaInfo() {
-    return {
-      titleTemplate: (value) => (value ? `${value} | Cereza` : 'Cereza'),
-      htmlAttrs: {
-        lang: 'en'
-      }
-    };
-  }
-})
+@Component
 export default class Header extends Vue {
   private hovered = false;
   private shouldFade = true;
