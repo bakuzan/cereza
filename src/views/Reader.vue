@@ -16,6 +16,14 @@
         <div v-else-if="data && data.gallery" class="result apollo">
           <div class="reader__header">
             <h2 class="page__title">{{ data.gallery.folderName }}</h2>
+            <div class="flex-spacer"></div>
+            <RadioButtonGroup
+              id="mode"
+              name="mode"
+              :value="mode"
+              :options="modeOptions"
+              @change="onModeChange"
+            />
             <Button
               class="reader__button"
               aria-label="Back to directory"
@@ -27,22 +35,26 @@
           </div>
           <div
             v-if="data.gallery.canGallery"
-            class="reader-pane"
+            :class="{ 'reader-pane': true, 'reader-pane--gallery': !isReader }"
             v-crz-on-top="onPageTop"
           >
-            <div
+            <component
               v-for="(image, index) of data.gallery.images"
               :key="index"
               :id="`page_${index + 1}`"
+              :is="isReader ? 'div' : 'Button'"
               class="reader-entry"
+              @click="onImageSelect(image)"
             >
               <img
                 class="reader-entry__image"
                 :src="image"
                 :alt="`Page ${index + 1} of ${data.gallery.images.length}`"
               />
-              <div class="reader-entry__counter">{{ index + 1 }}</div>
-            </div>
+              <div v-if="isReader" class="reader-entry__counter">
+                {{ index + 1 }}
+              </div>
+            </component>
             <div class="reader-pane__footer">
               <Button
                 class="reader__button"
@@ -52,7 +64,8 @@
               >
             </div>
             <div class="reader-pane__info">
-              {{ data.gallery.images.length }} pages
+              {{ data.gallery.images.length }}
+              {{ isReader ? 'pages' : 'images' }}
             </div>
           </div>
           <div v-else>
@@ -63,6 +76,7 @@
           </div>
 
           <GoToWidget
+            v-if="isReader"
             :max="data.gallery.images.length"
             @submit="onGoToSubmit"
           />
@@ -82,13 +96,26 @@ import CrossIcon from '@/components/Icons/CrossIcon.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
 import LoadingBouncer from '@/components/LoadingBouncer.vue';
 import GoToWidget from '@/components/GoToWidget.vue';
+import RadioButtonGroup from '@/components/RadioButtonGroup.vue';
 
 import { OnTop } from '@/directives/OnTop';
 import scrollToAnchor from '@/utils/scrollToAnchor';
 import initReaderControls from '@/utils/userControls/reader';
 
+enum ReaderMode {
+  Gallery = 'gallery',
+  Reader = 'reader'
+}
+
 @Component({
-  components: { Button, CrossIcon, ErrorBlock, LoadingBouncer, GoToWidget },
+  components: {
+    Button,
+    CrossIcon,
+    ErrorBlock,
+    LoadingBouncer,
+    GoToWidget,
+    RadioButtonGroup
+  },
   directives: { OnTop },
   metaInfo() {
     return {
@@ -97,6 +124,11 @@ import initReaderControls from '@/utils/userControls/reader';
   }
 })
 export default class Reader extends Vue {
+  private readonly modeOptions = [
+    { value: ReaderMode.Reader, label: 'Reader' },
+    { value: ReaderMode.Gallery, label: 'Gallery' }
+  ];
+
   private removeControls: (() => void) | null = null;
 
   // Lifecycle
@@ -117,15 +149,41 @@ export default class Reader extends Vue {
     return (loc instanceof Array ? loc.pop() : loc) ?? '';
   }
 
+  get mode() {
+    const mode = this.$route.query['mode'];
+    return (mode instanceof Array ? mode.pop() : mode) ?? ReaderMode.Reader;
+  }
+
+  get isReader() {
+    return this.mode === ReaderMode.Reader;
+  }
+
   // Methods
   private onGoToSubmit(pageNumber: string) {
     const loc = this.$route.query['loc'];
     this.$router.replace(`${this.$route.path}?loc=${loc}#page_${pageNumber}`);
   }
 
+  private onModeChange({ value }: { value: string }) {
+    this.$router.replace({
+      hash: undefined,
+      name: 'Reader',
+      query: {
+        ...this.$route.query,
+        mode: value
+      }
+    });
+  }
+
   private onCloseReader() {
     const param = window.encodeURIComponent(this.directoryLocation);
     this.$router.push(`/directory?loc=${param}`);
+  }
+
+  private onImageSelect(image: string) {
+    console.log('selected image...', image);
+    // TODO
+    // Might need to change the image model returned so I can open this
   }
 
   private onPageTop(hash: string) {
@@ -171,6 +229,14 @@ export default class Reader extends Vue {
 }
 
 .reader-pane {
+  &--gallery {
+    display: grid;
+    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 5px;
+    padding: 0 5px;
+  }
+
   &__footer {
     display: flex;
     justify-content: center;
