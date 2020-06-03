@@ -21,10 +21,15 @@ type DirectoryResponse {
   entries: [DirectoryEntry]!
 }
 
+type CRZImage {
+  image: String
+  url: String
+}
+
 type GalleryResponse {
   canGallery: Boolean
   folderName: String
-  images: [String]!
+  images: [CRZImage]!
 }
 
 type CRZVideo {

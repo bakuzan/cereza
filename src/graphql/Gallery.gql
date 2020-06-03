@@ -2,6 +2,9 @@ query Gallery($path: String!) {
   gallery(path: $path) {
     canGallery
     folderName
-    images
+    images {
+      image
+      url
+    }
   }
 }

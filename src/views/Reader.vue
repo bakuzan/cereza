@@ -39,16 +39,16 @@
             v-crz-on-top="onPageTop"
           >
             <component
-              v-for="(image, index) of data.gallery.images"
+              v-for="(item, index) of data.gallery.images"
               :key="index"
               :id="`page_${index + 1}`"
               :is="isReader ? 'div' : 'Button'"
               class="reader-entry"
-              @click="onImageSelect(image)"
+              @click="onImageSelect(item)"
             >
               <img
                 class="reader-entry__image"
-                :src="image"
+                :src="item.image"
                 :alt="`Page ${index + 1} of ${data.gallery.images.length}`"
               />
               <div v-if="isReader" class="reader-entry__counter">
@@ -90,6 +90,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+
+import { ApolloResponse } from '@i/ApolloResponse';
+import { ConfirmationResponse } from '@i/ConfirmationResponse';
+import { CRZImage } from '@i/CRZImage';
 
 import Button from '@/components/Button.vue';
 import CrossIcon from '@/components/Icons/CrossIcon.vue';
@@ -180,10 +184,19 @@ export default class Reader extends Vue {
     this.$router.push(`/directory?loc=${param}`);
   }
 
-  private onImageSelect(image: string) {
-    console.log('selected image...', image);
-    // TODO
-    // Might need to change the image model returned so I can open this
+  private async onImageSelect(item: CRZImage) {
+    const result = await this.$apollo.query<
+      ApolloResponse<ConfirmationResponse>
+    >({
+      fetchPolicy: 'network-only',
+      query: require('../graphql/Action.gql'),
+      variables: { path: item.url }
+    });
+
+    if (!result.data?.action.success) {
+      // TODO Handle error
+      console.error(`Failed action @ ${item.url}`, result);
+    }
   }
 
   private onPageTop(hash: string) {
@@ -274,6 +287,16 @@ export default class Reader extends Vue {
     border-radius: 10px;
     text-align: center;
     z-index: 100;
+  }
+}
+
+.button.reader-entry {
+  border: 1px solid transparent;
+
+  &:focus,
+  &:hover,
+  &:active {
+    border-color: var(--accent-colour);
   }
 }
 </style>

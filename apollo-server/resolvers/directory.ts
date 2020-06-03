@@ -1,10 +1,16 @@
-import child from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
 
 import { DirectoryArgs } from '@i/DirectoryArgs';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
+import { CRZImage } from '@i/CRZImage';
 import { CRZVideo } from '@i/CRZVideo';
+
 import { pathToFolderName } from '@s/utils';
 import createResolver from '@s/utils/createResolver';
+
+const writeFileAsync = promisify(fs.writeFile);
 
 export default createResolver({
   Query: {
@@ -27,7 +33,7 @@ export default createResolver({
       const entries = await context.readDirectory(args.path);
       const canGallery = context.canGallery(entries);
       const folderName = pathToFolderName(args.path);
-      let images: string[] = [];
+      let images: CRZImage[] = [];
 
       if (canGallery) {
         images = await context.readImages(entries);
@@ -70,15 +76,10 @@ export default createResolver({
         };
       }
 
-      const cmdArgs = ['/s', '/c', 'start', '""', '/b', `"${args.path}"`];
-      const cmdOpts: Partial<child.SpawnOptions> = {
-        detached: true,
-        env: process.env,
-        stdio: 'ignore',
-        windowsVerbatimArguments: true
-      };
-
-      child.spawn('cmd.exe', cmdArgs, cmdOpts).unref();
+      await writeFileAsync(
+        path.resolve(__dirname, './targetPath.txt'),
+        args.path
+      );
 
       return {
         success: true,
