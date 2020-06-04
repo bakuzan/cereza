@@ -22,7 +22,7 @@ export default (app: express.Application) => {
   app.use(`/${appName}`, express.static(distPath));
 
   // Streaming
-  app.get('/video/:key', streamVideo);
+  app.get('/video', streamVideo);
 
   // Always return the main index.html, so router render the route in the client
   if (process.env.NODE_ENV === Environment.Production) {

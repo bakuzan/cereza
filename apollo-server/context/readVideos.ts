@@ -6,7 +6,7 @@ import { obfuscate } from '../utils/obfuscate';
 
 const base = process.env.VUE_APP_GRAPHQL_HTTP || '';
 const getVideoUrl = (url: string) =>
-  `${base.replace('/graphql', '')}/video/${obfuscate(url)}`;
+  `${base.replace('/graphql', '')}/video?key=${obfuscate(url)}`;
 
 export default async function readVideos(
   entries: DirectoryEntry[]

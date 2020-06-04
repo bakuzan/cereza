@@ -5,7 +5,7 @@ import { getPathExtension } from '../utils';
 import { deobfuscate } from '../utils/obfuscate';
 
 export function streamVideo(req: Request, res: Response) {
-  const { key } = req.params;
+  const { key } = req.query as Record<string, string>;
 
   const videoPath = deobfuscate(key);
   const videoExt = getPathExtension(videoPath);

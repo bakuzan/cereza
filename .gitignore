@@ -32,3 +32,4 @@ schema.graphql
 server/**/*
 !server/.gitkeep
 apollo-server/**/*.txt
+lastTargetPath.txt
