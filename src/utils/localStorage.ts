@@ -3,15 +3,10 @@
 import { CRZSettings } from '@i/CRZSettings';
 import { keys, prop, generateUniqueId } from '@/utils';
 
-interface StoreSubscriber<T> {
-  id: string;
-  callback: <K extends keyof T>(value: T[K]) => void;
-}
-
 class Store<T> {
   private storeName: string;
   private defaultValue: T;
-  private subscribers: Map<keyof T, StoreSubscriber<T>[]> = new Map([]);
+  private subscribers: Map<keyof T, any[]> = new Map([]);
 
   constructor(storeName: string, defaultValue: T) {
     this.storeName = storeName;
@@ -65,10 +60,7 @@ class Store<T> {
     this.replace(upgradedData as T);
   }
 
-  public subscribe<K extends keyof T>(
-    key: K,
-    callback: <K extends keyof T>(value: T[K]) => void
-  ) {
+  public subscribe<K extends keyof T>(key: K, callback: (value: T[K]) => void) {
     const id = generateUniqueId();
     const calls = this.subscribers.get(key) ?? [];
     this.subscribers.set(key, [...calls, { id, callback }]);
@@ -97,6 +89,7 @@ class Store<T> {
 }
 
 const store = new Store<CRZSettings>('crzSettings', {
+  galleryFallbackModes: [],
   theme: 'classic'
 });
 

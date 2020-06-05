@@ -36,6 +36,9 @@ export default createResolver({
       let images: CRZImage[] = [];
 
       if (canGallery) {
+        // TODO
+        // Page images... (only "read images" using paging args (page, size))
+        // Return entries total count
         images = await context.readImages(entries);
       }
 

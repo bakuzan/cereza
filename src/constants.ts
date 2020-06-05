@@ -22,6 +22,11 @@ export enum EventKey {
   Space = ' '
 }
 
+export enum ReaderMode {
+  Gallery = 'gallery',
+  Reader = 'reader'
+}
+
 export const Icons = {
   cross: '\u2573\ufe0e'
 };
