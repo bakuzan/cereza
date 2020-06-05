@@ -17,6 +17,7 @@
       @focus="onFocus"
       @blur="onBlur"
       @keydown="onKeyDown"
+      @keypress="onKeyPress"
     />
     <label :for="id" class="input-box__label">{{ label }}</label>
     <Button
@@ -139,8 +140,13 @@ export default class InputBox extends Vue {
     return event;
   }
 
-  @Emit('key-down')
+  @Emit('keydown')
   private onKeyDown(event: KeyboardEvent) {
+    return event;
+  }
+
+  @Emit('keypress')
+  private onKeyPress(event: KeyboardEvent) {
     return event;
   }
 }

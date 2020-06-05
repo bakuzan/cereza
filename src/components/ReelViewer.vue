@@ -60,8 +60,23 @@
       </div>
     </div>
     <div class="reel-viewer__sidebar">
+      <InputBox
+        id="filter"
+        class-name="filter-box video-filter"
+        name="filter"
+        label="Filter videos..."
+        :value="filter"
+        @change="onFilter"
+        @keypress.stop="() => null"
+      />
       <ul class="videos">
-        <li v-for="item of data" :key="item.fullName" class="videos__item">
+        <li
+          v-for="item of data.filter((x) =>
+            x.name.toLowerCase().includes(filter)
+          )"
+          :key="item.fullName"
+          class="videos__item"
+        >
           <Button
             :class="{
               videos__button: true,
@@ -88,6 +103,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { CRZVideo } from '@i/CRZVideo';
 import Button from '@/components/Button.vue';
+import InputBox from '@/components/InputBox.vue';
 import Tickbox from '@/components/Tickbox.vue';
 import PlayIcon from '@/components/Icons/PlayIcon.vue';
 import ArrowLeft from '@/components/Icons/ArrowLeft.vue';
@@ -104,12 +120,21 @@ const defaultMeta = {
 };
 
 @Component({
-  components: { Button, PlayIcon, ArrowLeft, ArrowRight, RandomIcon, Tickbox }
+  components: {
+    Button,
+    PlayIcon,
+    ArrowLeft,
+    ArrowRight,
+    RandomIcon,
+    Tickbox,
+    InputBox
+  }
 })
 export default class ReelViewer extends Vue {
   @Prop({ default: [] }) readonly data!: CRZVideo[];
 
   private autoCycle = false;
+  private filter = '';
   private destroyListeners: (() => void) | null = null;
   private removeControls: (() => void) | null = null;
   private meta = { ...defaultMeta };
@@ -117,8 +142,10 @@ export default class ReelViewer extends Vue {
   // Lifecycle
   mounted() {
     this.removeControls = initReelControls({
+      onChange: this.onChangeVideo,
       onPlaybackSpeedChange: (speed: number) =>
         (this.meta.playbackSpeed = speed),
+      onRandom: this.onRandom,
       selector: '#videoPlayer'
     });
   }
@@ -154,6 +181,10 @@ export default class ReelViewer extends Vue {
   }
 
   // Methods
+  private onFilter({ value }: { value: string }) {
+    this.$set(this, 'filter', value.toLowerCase());
+  }
+
   private isActive(item: CRZVideo) {
     return this.activeVideo && this.activeVideo.fullName === item.fullName;
   }
@@ -235,6 +266,8 @@ export default class ReelViewer extends Vue {
 <style scoped lang="scss">
 @import '../styles/_mixins';
 
+$filter-box-height: 46px;
+
 $max-height: 500px;
 $max-width: 100%;
 
@@ -298,7 +331,7 @@ $max-width: 100%;
 
 .videos {
   list-style-type: none;
-  max-height: calc(100vh - (var(--header-height) * 2));
+  max-height: calc(100vh - (var(--header-height) * 2) - #{$filter-box-height});
   padding: 0;
   margin: 0;
   overflow: auto;
@@ -324,6 +357,10 @@ $max-width: 100%;
 }
 </style>
 <style lang="scss">
+.video-filter input {
+  color: inherit !important;
+}
+
 .controls__tickbox {
   --tickbox-default-colour: var(--contrast-colour);
 }

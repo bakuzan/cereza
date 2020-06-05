@@ -3,7 +3,9 @@ import { EventKey } from '@/constants';
 type RemoveListener = () => void;
 
 interface ReelOptions {
+  onChange(direction: number): void;
   onPlaybackSpeedChange(speed: number): void;
+  onRandom(): void;
   selector: string;
 }
 
@@ -34,6 +36,25 @@ export default function initReelControls(options: ReelOptions): RemoveListener {
     }
 
     switch (event.key) {
+      case EventKey.KeyP:
+        options.onChange(-1);
+        break;
+
+      case EventKey.KeyN:
+        options.onChange(1);
+        break;
+
+      case EventKey.KeyR:
+        options.onRandom();
+        break;
+
+      case EventKey.KeyS:
+        if ((event.target as HTMLElement).id !== 'filter') {
+          event.preventDefault();
+          document.querySelector<HTMLInputElement>('#filter')?.focus();
+        }
+        break;
+
       // Play/Pause
       case EventKey.Space: {
         event.preventDefault();

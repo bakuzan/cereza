@@ -16,6 +16,29 @@
         <div v-else-if="data && data.reel" class="result apollo">
           <div class="reel__header">
             <h2 class="page__title">{{ data.reel.folderName }}</h2>
+
+            <div class="flex-spacer"></div>
+
+            <Help title="Reel keyboard controls">
+              <table class="shortcuts-table">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;">Control</th>
+                    <th>Shortcut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="item of reelShortcuts"
+                    :key="item.name"
+                    class="shortcuts-table__row"
+                  >
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.shortcut }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </Help>
             <Button
               class="reel__button"
               aria-label="Back to directory"
@@ -50,9 +73,17 @@ import CrossIcon from '@/components/Icons/CrossIcon.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
 import LoadingBouncer from '@/components/LoadingBouncer.vue';
 import ReelViewer from '@/components/ReelViewer.vue';
+import Help from '@/components/Help.vue';
 
 @Component({
-  components: { Button, CrossIcon, ErrorBlock, LoadingBouncer, ReelViewer },
+  components: {
+    Button,
+    CrossIcon,
+    ErrorBlock,
+    LoadingBouncer,
+    ReelViewer,
+    Help
+  },
   metaInfo() {
     return {
       title: 'Reel'
@@ -60,6 +91,28 @@ import ReelViewer from '@/components/ReelViewer.vue';
   }
 })
 export default class Reel extends Vue {
+  private reelShortcuts = [
+    { name: 'Previous video', shortcut: 'p' },
+    { name: 'Next video', shortcut: 'n' },
+    { name: 'Random video', shortcut: 'r' },
+    { name: 'Focus filter box', shortcut: 's' },
+
+    { name: 'Toggle play/pause', shortcut: 'Spacebar' },
+    { name: 'Toggle fullscreen', shortcut: 'f' },
+
+    { name: 'Decrease playback rate 0.25x', shortcut: '-' },
+    { name: 'Increase playback rate 0.25x', shortcut: '=' },
+    { name: 'Reset playback rate', shortcut: '0' },
+
+    { name: 'Skip -10s', shortcut: ',' },
+    { name: 'Skip -30s', shortcut: '<' },
+    { name: 'Skip -60s', shortcut: '\\' },
+
+    { name: 'Skip +10s', shortcut: '.' },
+    { name: 'Skip +30s', shortcut: '>' },
+    { name: 'Skip +60s', shortcut: '/' }
+  ];
+
   // Lifecycle
   //   mounted() {}
 
@@ -79,10 +132,13 @@ export default class Reel extends Vue {
 
 <style lang="scss" scoped>
 .reel {
-  background: var(--base-colour);
-  color: var(--contrast-colour);
   padding-bottom: 5px;
   margin: -5px;
+
+  .result {
+    background: var(--base-colour);
+    color: var(--contrast-colour);
+  }
 
   .page__title {
     margin-left: 10px;
@@ -91,8 +147,8 @@ export default class Reel extends Vue {
   &__header {
     display: flex;
     flex-flow: wrap;
-    justify-content: space-between;
     align-items: center;
+    background-color: inherit;
   }
 
   &__button {
@@ -102,5 +158,17 @@ export default class Reel extends Vue {
 
 .reel-pane {
   padding: 5px;
+}
+
+.shortcuts-table {
+  padding: 5px;
+
+  th {
+    border-bottom: 1px solid var(--accent-colour);
+  }
+
+  &__row {
+    padding: 2px 0;
+  }
 }
 </style>
