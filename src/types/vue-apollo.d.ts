@@ -1,3 +1,4 @@
 declare module 'vue-apollo' {
-  export * from 'vue-apollo/types/vue-apollo';
+  export { default, ApolloProvider } from 'vue-apollo/types';
+  export { SmartQuery } from 'vue-apollo/types/vue-apollo';
 }
