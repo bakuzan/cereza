@@ -2,13 +2,14 @@
   <div id="reader" class="page reader">
     <ApolloQuery
       :query="require('../graphql/Gallery.gql')"
-      :variables="{ path: directoryLocation }"
+      :variables="{ path: directoryLocation, page: initialPage, size: 25 }"
+      :skip="initialPage === null"
     >
-      <template slot-scope="{ result: { loading, error, data } }">
+      <template slot-scope="{ result: { loading, error, data }, query }">
         <LoadingBouncer v-if="loading" />
 
         <ErrorBlock
-          v-else-if="error"
+          v-if="error"
           :data="error"
           message="Failed to fetch gallery contents."
         />
@@ -38,6 +39,7 @@
             :data="data.gallery"
             :location="directoryLocation"
             :mode="mode"
+            :query="query"
             @close="onCloseReader()"
           />
           <div v-else>
@@ -67,6 +69,7 @@ import GalleryViewer from '@/components/GalleryViewer.vue';
 import { store } from '@/utils/localStorage';
 import scrollToAnchor from '@/utils/scrollToAnchor';
 import initReaderControls from '@/utils/userControls/reader';
+import calculateGalleryPage from '@/utils/calculateGalleryPage';
 import { ReaderMode } from '@/constants';
 
 @Component({
@@ -90,12 +93,16 @@ export default class Reader extends Vue {
     { value: ReaderMode.Gallery, label: 'Gallery' }
   ];
 
+  private initialPage: number | null = null;
   private removeControls: (() => void) | null = null;
 
   // Lifecycle
   mounted() {
     scrollToAnchor('#reader', -55);
     this.removeControls = initReaderControls(this);
+
+    const hashNumber = this.$route.hash?.split('_').pop() || 1;
+    this.initialPage = calculateGalleryPage(Number(hashNumber));
   }
 
   beforeDestroy() {

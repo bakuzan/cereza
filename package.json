@@ -23,18 +23,18 @@
     "module-alias": "^2.2.2",
     "reflect-metadata": "^0.1.13",
     "register-service-worker": "^1.7.1",
-    "sequelize": "^5.21.8",
+    "sequelize": "^5.21.12",
     "sequelize-cli": "^5.5.1",
     "sequelize-typescript": "^1.1.0",
     "sqlite3": "^4.2.0",
     "umzug": "^2.3.0",
     "video-extensions": "^1.1.0",
     "vue": "^2.6.11",
-    "vue-apollo": "^3.0.0-beta.11",
+    "vue-apollo": "^3.0.3",
     "vue-class-component": "^7.2.3",
-    "vue-meta": "^2.3.3",
-    "vue-property-decorator": "^8.4.1",
-    "vue-router": "^3.1.6"
+    "vue-meta": "^2.3.4",
+    "vue-property-decorator": "^8.4.2",
+    "vue-router": "^3.3.2"
   },
   "devDependencies": {
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.8.3",
@@ -62,7 +62,7 @@
     "prettier": "^1.19.1",
     "sass-loader": "^8.0.2",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "~3.8.3",
+    "typescript": "~3.9.5",
     "vue-cli-plugin-apollo": "^0.21.3",
     "vue-template-compiler": "^2.6.11"
   },

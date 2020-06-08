@@ -23,12 +23,14 @@ type DirectoryResponse {
 
 type CRZImage {
   image: String
+  pageNumber: Int
   url: String
 }
 
 type GalleryResponse {
   canGallery: Boolean
   folderName: String
+  totalImagesCount: Int
   images: [CRZImage]!
 }
 

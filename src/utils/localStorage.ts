@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { CRZSettings } from '@i/CRZSettings';
 import { keys, prop, generateUniqueId } from '@/utils';
 
 class Store<T> {
   private storeName: string;
   private defaultValue: T;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   private subscribers: Map<keyof T, any[]> = new Map([]);
 
   constructor(storeName: string, defaultValue: T) {
@@ -18,7 +18,7 @@ class Store<T> {
       ? localStorage
       : {
           getItem: (key: string) => '',
-          setItem: (key: string, value: string) => {}
+          setItem: (key: string, value: string) => ({})
         };
   }
 

@@ -1,9 +1,11 @@
-query Gallery($path: String!) {
-  gallery(path: $path) {
+query Gallery($path: String!, $page: Int!, $size: Int!) {
+  gallery(path: $path, page: $page, size: $size) {
     canGallery
     folderName
+    totalImagesCount
     images {
       image
+      pageNumber
       url
     }
   }

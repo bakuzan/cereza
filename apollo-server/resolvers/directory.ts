@@ -6,8 +6,9 @@ import { DirectoryArgs } from '@i/DirectoryArgs';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
 import { CRZImage } from '@i/CRZImage';
 import { CRZVideo } from '@i/CRZVideo';
+import { PagedArgs } from '@i/PagedArgs';
 
-import { pathToFolderName } from '@s/utils';
+import { pathToFolderName, filterToFiles } from '@s/utils';
 import createResolver from '@s/utils/createResolver';
 
 const writeFileAsync = promisify(fs.writeFile);
@@ -29,22 +30,24 @@ export default createResolver({
         )
       };
     },
-    async gallery(_, args: DirectoryArgs, context) {
+    async gallery(_, args: DirectoryArgs & PagedArgs, context) {
       const entries = await context.readDirectory(args.path);
       const canGallery = context.canGallery(entries);
       const folderName = pathToFolderName(args.path);
+      const totalImagesCount = entries.filter(filterToFiles).length;
       let images: CRZImage[] = [];
 
       if (canGallery) {
-        // TODO
-        // Page images... (only "read images" using paging args (page, size))
-        // Return entries total count
-        images = await context.readImages(entries);
+        const start = args.page * args.size;
+        const end = start + args.size;
+
+        images = await context.readImages(entries, start, end);
       }
 
       return {
         canGallery,
         folderName,
+        totalImagesCount,
         images
       };
     },

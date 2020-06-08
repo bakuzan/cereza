@@ -11,7 +11,7 @@ import classNames from 'classnames';
 @Component
 export default class LoadingBouncer extends Vue {
   @Prop({ default: undefined }) readonly cirlceClass: string | undefined;
-  @Prop({ default: false }) readonly local!: boolean;
+  @Prop({ default: true }) readonly local!: boolean;
   private range = [1, 2, 3];
 
   get classes() {

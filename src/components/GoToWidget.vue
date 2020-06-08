@@ -66,9 +66,11 @@ export default class GoToWidget extends Vue {
 
   private onGoToSubmit() {
     if (this.goToPage) {
-      this.$emit('submit', this.goToPage);
-      this.goToPage = '';
+      const value = this.goToPage;
       this.showWidget = false;
+      this.goToPage = '';
+
+      this.$nextTick(() => this.$emit('submit', value));
     }
   }
 }

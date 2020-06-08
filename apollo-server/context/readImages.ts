@@ -8,12 +8,15 @@ import { getPathExtension, filterToFiles } from '../utils';
 const readFile = promisify(fs.readFile);
 
 export default async function readImages(
-  entries: DirectoryEntry[]
+  entries: DirectoryEntry[],
+  start: number,
+  end: number
 ): Promise<CRZImage[]> {
-  const items = entries.filter(filterToFiles);
+  const items = entries.filter(filterToFiles).slice(start, end);
   const images: CRZImage[] = [];
 
-  for (const entry of items) {
+  for (let i = 0; i < items.length; i++) {
+    const entry = items[i];
     const filePath = entry.targetPath ?? entry.path;
     const buff = await readFile(filePath);
 
@@ -22,6 +25,7 @@ export default async function readImages(
 
     images.push({
       image: `data:image/${ext};base64,${image}`,
+      pageNumber: start + i + 1, // begin at page 1
       url: entry.path
     });
   }

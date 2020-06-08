@@ -24,8 +24,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import classNames from 'classnames';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 
 import Button from '@/components/Button.vue';
 import RandomIcon from '@/components/Icons/RandomIcon.vue';

@@ -11,7 +11,11 @@ export interface CRZContext {
   isFile(location: string): Promise<boolean>;
   pathExists(location: string): Promise<boolean>;
   readDirectory(location: string): Promise<Array<DirectoryEntry>>;
-  readImages(entries: DirectoryEntry[]): Promise<Array<CRZImage>>;
+  readImages(
+    entries: DirectoryEntry[],
+    start: number,
+    end: number
+  ): Promise<Array<CRZImage>>;
   readVideos(entries: DirectoryEntry[]): Promise<Array<CRZVideo>>;
   Pinned: Repository<Pinned>;
 }

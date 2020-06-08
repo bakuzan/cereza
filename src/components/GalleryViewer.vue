@@ -5,19 +5,23 @@
       v-crz-on-top="onPageTop"
     >
       <component
-        v-for="(item, index) of data.images"
-        :key="index"
-        :id="`page_${index + 1}`"
+        v-for="item of images"
+        :key="item.pageNumber"
+        :id="`page_${item.pageNumber}`"
         :is="isReader ? 'div' : 'Button'"
         class="reader-entry"
         @click="onImageSelect(item)"
       >
         <img
+          v-crz-on-intersect="onLoadMore"
           class="reader-entry__image"
           :src="item.image"
-          :alt="`Page ${index + 1} of ${data.images.length}`"
+          :alt="`Page ${item.pageNumber} of ${data.totalImagesCount}`"
+          :data-page-number="item.pageNumber"
         />
-        <div v-if="isReader" class="reader-entry__counter">{{ index + 1 }}</div>
+        <div v-if="isReader" class="reader-entry__counter">
+          {{ item.pageNumber }}
+        </div>
       </component>
     </div>
     <div class="gallery-viewer__footer">
@@ -26,20 +30,21 @@
       >
     </div>
     <div class="gallery-viewer__info">
-      {{ data.images.length }}
+      {{ data.totalImagesCount }}
       {{ isReader ? 'pages' : 'images' }}
     </div>
 
     <GoToWidget
       v-if="isReader"
-      :max="data.images.length"
+      :max="data.totalImagesCount"
       @submit="onGoToSubmit"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
+import { SmartQuery } from 'vue-apollo';
 
 import { ApolloResponse } from '@i/ApolloResponse';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
@@ -49,33 +54,62 @@ import { GalleryResponse } from '@i/GalleryResponse';
 import Button from '@/components/Button.vue';
 import GoToWidget from '@/components/GoToWidget.vue';
 
+import { OnIntersect } from '@/directives/OnIntersect';
 import { OnTop } from '@/directives/OnTop';
+import calculateGalleryPage from '@/utils/calculateGalleryPage';
 import { ReaderMode } from '@/constants';
+import { getPageFromHash } from '../utils';
+
+interface GalleryView {
+  gallery: GalleryResponse;
+}
 
 @Component({
   components: {
     Button,
     GoToWidget
   },
-  directives: { OnTop }
+  directives: { OnIntersect, OnTop }
 })
 export default class GalleryViewer extends Vue {
   @Prop({ required: true }) readonly data!: GalleryResponse;
   @Prop({ required: true }) readonly location!: string;
   @Prop({ required: true }) readonly mode!: ReaderMode;
+  @Prop({ required: true }) readonly query!: SmartQuery<{
+    page: number;
+    size: number;
+  }>;
+
+  private hasMore = true;
 
   // Computed
   get isReader() {
     return this.mode === ReaderMode.Reader;
   }
 
+  get images() {
+    return Array(this.data.totalImagesCount)
+      .fill(null)
+      .map(
+        (_, i) =>
+          this.data.images.find((x) => x.pageNumber === i + 1) ?? {
+            image: undefined,
+            pageNumber: i + 1,
+            url: ''
+          }
+      );
+  }
+
   // Methods
   private onGoToSubmit(pageNumber: string) {
-    const loc = this.location;
-    this.$router.replace(`${this.$route.path}?loc=${loc}#page_${pageNumber}`);
+    this.onPageTop(`#page_${pageNumber}`, 'true');
   }
 
   private async onImageSelect(item: CRZImage) {
+    if (this.isReader) {
+      return;
+    }
+
     const result = await this.$apollo.query<
       ApolloResponse<ConfirmationResponse>
     >({
@@ -90,8 +124,56 @@ export default class GalleryViewer extends Vue {
     }
   }
 
-  private onPageTop(hash: string) {
-    if (this.$route.hash === hash) {
+  private async onLoadMore(imageNumber: number) {
+    if (this.query.loading) {
+      return;
+    }
+
+    const page = calculateGalleryPage(imageNumber);
+
+    await this.query.fetchMore({
+      variables: {
+        page,
+        size: 25
+      },
+      updateQuery: (prev: GalleryView, result: any) => {
+        const fetchMoreResult = result.fetchMoreResult as GalleryView;
+
+        if (!fetchMoreResult) {
+          this.hasMore = false;
+          return prev;
+        }
+
+        const images = [
+          ...prev.gallery.images,
+          ...fetchMoreResult.gallery.images
+        ].sort((a, b) => b.pageNumber - a.pageNumber);
+
+        const totalImages = fetchMoreResult.gallery.totalImagesCount;
+        this.hasMore = images.length !== totalImages;
+
+        return Object.assign({}, prev, fetchMoreResult, {
+          gallery: {
+            ...fetchMoreResult.gallery,
+            images
+          }
+        });
+      }
+    });
+  }
+
+  private onPageTop(hash: string, scroll = 'false') {
+    const currPage = getPageFromHash(this.$route.hash ?? 'page_1');
+    const nextPage = getPageFromHash(hash);
+
+    const isSamePage = currPage === nextPage;
+    const isNextPage = currPage + 1 === nextPage;
+    const isPrevPage = currPage - 1 === nextPage;
+    const currScroll = this.$route.query['scroll'];
+    const scrollChanged =
+      currScroll && currScroll !== scroll && scroll !== 'true';
+
+    if (isSamePage || (!isNextPage && !isPrevPage && scrollChanged)) {
       return;
     }
 
@@ -100,13 +182,14 @@ export default class GalleryViewer extends Vue {
       name: 'Reader',
       query: {
         ...this.$route.query,
-        scroll: 'false'
+        scroll
       }
     });
   }
 
-  private onClose() {
-    this.$emit('close');
+  @Emit('close')
+  private onClose(event: Event) {
+    return event;
   }
 }
 </script>

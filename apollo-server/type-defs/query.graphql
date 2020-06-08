@@ -12,7 +12,7 @@ type Query {
   directory(path: String!): DirectoryResponse
 
   "Fetch gallery directory contents"
-  gallery(path: String!): GalleryResponse
+  gallery(path: String!, page: Int!, size: Int!): GalleryResponse
 
   "Fetch reel directory contents"
   reel(path: String!): ReelResponse

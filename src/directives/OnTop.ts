@@ -1,5 +1,7 @@
 import Vue, { DirectiveOptions } from 'vue';
 
+import { getPageFromHash } from '@/utils';
+
 interface VuePlus extends Vue {
   observers?: IntersectionObserver[];
   observerTimer?: number;
@@ -28,7 +30,7 @@ export const OnTop: DirectiveOptions = {
         vm.observerTimer = window.setTimeout(() => {
           const pageId = entry.target.id;
           const delta = entry.boundingClientRect.top <= 0 ? 1 : -1;
-          const curr = Number(pageId.split('_').pop());
+          const curr = getPageFromHash(pageId);
           const newPageId = `#page_${curr + delta}`;
           callback(newPageId);
         }, 500);
