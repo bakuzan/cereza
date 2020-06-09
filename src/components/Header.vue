@@ -89,6 +89,8 @@ $padding: 5px;
   &__link {
     color: var(--contrast-colour);
 
+    &:focus,
+    &:hover,
     &.router-link-exact-active {
       color: var(--accent-colour);
     }
@@ -104,6 +106,7 @@ $padding: 5px;
     color: inherit;
   }
 
+  &__link:focus,
   &__link:hover {
     color: var(--accent-colour);
   }

@@ -163,7 +163,7 @@ export default class GalleryViewer extends Vue {
   }
 
   private onPageTop(hash: string, scroll = 'false') {
-    const currPage = getPageFromHash(this.$route.hash ?? 'page_1');
+    const currPage = getPageFromHash(this.$route.hash);
     const nextPage = getPageFromHash(hash);
 
     const isSamePage = currPage === nextPage;

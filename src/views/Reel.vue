@@ -34,7 +34,7 @@
                     class="shortcuts-table__row"
                   >
                     <td>{{ item.name }}</td>
-                    <td>{{ item.shortcut }}</td>
+                    <td style="text-align:center;">{{ item.shortcut }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -96,6 +96,8 @@ export default class Reel extends Vue {
     { name: 'Next video', shortcut: 'n' },
     { name: 'Random video', shortcut: 'r' },
     { name: 'Focus filter box', shortcut: 's' },
+    { name: 'Toggle auto cycle', shortcut: 'a' },
+    { name: 'Toggle looping', shortcut: 'l' },
 
     { name: 'Toggle play/pause', shortcut: 'Spacebar' },
     { name: 'Toggle fullscreen', shortcut: 'f' },
@@ -112,9 +114,6 @@ export default class Reel extends Vue {
     { name: 'Skip +30s', shortcut: '>' },
     { name: 'Skip +60s', shortcut: '/' }
   ];
-
-  // Lifecycle
-  //   mounted() {}
 
   // Computed
   get directoryLocation() {
@@ -135,6 +134,7 @@ export default class Reel extends Vue {
   padding-bottom: 5px;
   margin: -5px;
 
+  &,
   .result {
     background: var(--base-colour);
     color: var(--contrast-colour);

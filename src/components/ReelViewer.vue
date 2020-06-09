@@ -146,6 +146,7 @@ export default class ReelViewer extends Vue {
       onPlaybackSpeedChange: (speed: number) =>
         (this.meta.playbackSpeed = speed),
       onRandom: this.onRandom,
+      onToggleAutoCycle: this.onAutoCycle,
       selector: '#videoPlayer'
     });
   }

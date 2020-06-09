@@ -6,6 +6,7 @@ interface ReelOptions {
   onChange(direction: number): void;
   onPlaybackSpeedChange(speed: number): void;
   onRandom(): void;
+  onToggleAutoCycle(): void;
   selector: string;
 }
 
@@ -36,6 +37,10 @@ export default function initReelControls(options: ReelOptions): RemoveListener {
     }
 
     switch (event.key) {
+      case EventKey.KeyA:
+        options.onToggleAutoCycle();
+        break;
+
       case EventKey.KeyP:
         options.onChange(-1);
         break;
@@ -48,6 +53,10 @@ export default function initReelControls(options: ReelOptions): RemoveListener {
         options.onRandom();
         break;
 
+      case EventKey.KeyL:
+        player.loop = !player.loop;
+        break;
+
       case EventKey.KeyS:
         if ((event.target as HTMLElement).id !== 'filter') {
           event.preventDefault();
@@ -58,6 +67,11 @@ export default function initReelControls(options: ReelOptions): RemoveListener {
       // Play/Pause
       case EventKey.Space: {
         event.preventDefault();
+
+        if (event.target === player) {
+          return;
+        }
+
         return player.paused ? player.play() : player.pause();
       }
 

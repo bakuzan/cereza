@@ -27,6 +27,6 @@ export const generateUniqueId = (): string =>
     ).toString(16);
   });
 
-export function getPageFromHash(hash: string) {
-  return Number(hash.split('_').pop());
+export function getPageFromHash(hash: string | undefined, fallback = 1) {
+  return Number(hash?.split('_').pop() ?? fallback);
 }

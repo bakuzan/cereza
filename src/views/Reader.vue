@@ -25,6 +25,27 @@
               :options="modeOptions"
               @change="onModeChange"
             />
+
+            <Help title="Reader keyboard controls">
+              <table class="shortcuts-table">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;">Control</th>
+                    <th>Shortcut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="item of readerShortcuts"
+                    :key="item.name"
+                    class="shortcuts-table__row"
+                  >
+                    <td>{{ item.name }}</td>
+                    <td style="text-align:center;">{{ item.shortcut }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </Help>
             <Button
               class="reader__button"
               aria-label="Back to directory"
@@ -64,8 +85,10 @@ import CrossIcon from '@/components/Icons/CrossIcon.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
 import LoadingBouncer from '@/components/LoadingBouncer.vue';
 import RadioButtonGroup from '@/components/RadioButtonGroup.vue';
+import Help from '@/components/Help.vue';
 import GalleryViewer from '@/components/GalleryViewer.vue';
 
+import { getPageFromHash } from '@/utils';
 import { store } from '@/utils/localStorage';
 import scrollToAnchor from '@/utils/scrollToAnchor';
 import initReaderControls from '@/utils/userControls/reader';
@@ -79,7 +102,8 @@ import { ReaderMode } from '@/constants';
     ErrorBlock,
     LoadingBouncer,
     RadioButtonGroup,
-    GalleryViewer
+    GalleryViewer,
+    Help
   },
   metaInfo() {
     return {
@@ -93,6 +117,11 @@ export default class Reader extends Vue {
     { value: ReaderMode.Gallery, label: 'Gallery' }
   ];
 
+  private readerShortcuts = [
+    { name: 'Back a page', shortcut: ',' },
+    { name: 'Forward a page', shortcut: '.' }
+  ];
+
   private initialPage: number | null = null;
   private removeControls: (() => void) | null = null;
 
@@ -101,7 +130,7 @@ export default class Reader extends Vue {
     scrollToAnchor('#reader', -55);
     this.removeControls = initReaderControls(this);
 
-    const hashNumber = this.$route.hash?.split('_').pop() || 1;
+    const hashNumber = getPageFromHash(this.$route.hash);
     this.initialPage = calculateGalleryPage(Number(hashNumber));
   }
 
@@ -162,6 +191,11 @@ export default class Reader extends Vue {
   margin-top: calc(-5px - var(--header-height));
   z-index: 10;
 
+  > div,
+  .result {
+    background-color: inherit;
+  }
+
   .page__title {
     margin-left: 10px;
   }
@@ -171,10 +205,23 @@ export default class Reader extends Vue {
     flex-flow: wrap;
     justify-content: space-between;
     align-items: center;
+    background-color: inherit;
   }
 
   &__button {
     color: var(--contrast-colour);
+  }
+}
+
+.shortcuts-table {
+  padding: 5px;
+
+  th {
+    border-bottom: 1px solid var(--accent-colour);
+  }
+
+  &__row {
+    padding: 2px 0;
   }
 }
 </style>
