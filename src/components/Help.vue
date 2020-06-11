@@ -56,8 +56,9 @@ export default class Help extends Vue {
 
   private onOutsideClick(event: Event) {
     const isChild = this.$el.contains(event.target as HTMLElement);
+    const isKeydown = event.type === 'keydown';
 
-    if (!isChild) {
+    if (!isChild || isKeydown) {
       this.showHelp = !this.showHelp;
       this.updateWidgetPositioning();
     }
