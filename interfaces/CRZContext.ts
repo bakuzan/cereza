@@ -10,7 +10,10 @@ export interface CRZContext {
   canReel(entries: DirectoryEntry[]): Promise<boolean>;
   isFile(location: string): Promise<boolean>;
   pathExists(location: string): Promise<boolean>;
-  readDirectory(location: string): Promise<Array<DirectoryEntry>>;
+  readDirectory(
+    location: string,
+    isRecursive: boolean
+  ): Promise<Array<DirectoryEntry>>;
   readImages(
     entries: DirectoryEntry[],
     start: number,

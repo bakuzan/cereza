@@ -14,41 +14,38 @@ import getShortcutTargetPath from '@s/utils/getShortcutTargetPath';
 
 const readdir = promisify(fs.readdir);
 
-export default async function readDirectory(
-  directoryPath: string
-): Promise<DirectoryEntry[]> {
-  let systemPath = path.resolve(path.join(directoryPath, '\\'));
-
-  if (isShortcut(systemPath)) {
-    const result = await getShortcutTargetPath([systemPath]);
-
-    if (result.success) {
-      systemPath = result.items.pop()?.targetPath ?? systemPath;
-    }
-  }
-
-  const items = await readdir(systemPath, {
+async function getDirectoryItems(location: string) {
+  return await readdir(location, {
     encoding: 'utf-8',
     withFileTypes: true
   });
+}
 
-  let entries: DirectoryEntry[] = items.map((x) => {
-    const fullName = path.join(systemPath, x.name);
-    const parentName = path.basename(path.dirname(fullName));
+function processDirectory(
+  systemPath: string,
+  item: fs.Dirent,
+  level = 0
+): DirectoryEntry {
+  const fullName = path.join(systemPath, item.name);
+  const parentName = path.basename(path.dirname(fullName));
+  const isDirectory = item.isDirectory();
 
-    return {
-      name: x.name,
-      path: fullName,
-      targetPath: null,
-      parentName,
-      isDirectory: x.isDirectory(),
-      isFile: x.isFile(),
-      isImage: isImage(x.name),
-      isVideo: isVideo(x.name),
-      isShortcut: isShortcut(x.name)
-    };
-  });
+  return {
+    name: item.name,
+    path: fullName,
+    level,
+    targetPath: null,
+    parentName,
+    isDirectory,
+    isFile: item.isFile(),
+    isImage: isImage(item.name),
+    isVideo: isVideo(item.name),
+    isShortcut: isShortcut(item.name)
+  };
+}
 
+async function processShortcuts(items: DirectoryEntry[]) {
+  let entries = [...items];
   const shortcuts = entries.filter((x) => x.isShortcut);
 
   if (shortcuts.length) {
@@ -69,6 +66,44 @@ export default async function readDirectory(
           targetPath
         };
       });
+    }
+  }
+
+  return entries;
+}
+
+export default async function readDirectory(
+  directoryPath: string,
+  isRecursive: boolean
+): Promise<DirectoryEntry[]> {
+  let systemPath = path.resolve(path.join(directoryPath, '\\'));
+
+  if (isShortcut(systemPath)) {
+    const result = await getShortcutTargetPath([systemPath]);
+
+    if (result.success) {
+      systemPath = result.items.pop()?.targetPath ?? systemPath;
+    }
+  }
+
+  const items = await getDirectoryItems(systemPath);
+  const entries = await processShortcuts(
+    items.map((x) => processDirectory(systemPath, x))
+  );
+
+  if (isRecursive) {
+    for (const entry of entries) {
+      if (entry.isDirectory) {
+        const parentPath = entry.targetPath ?? entry.path;
+        const level = entry.level + 1;
+
+        const childItems = await getDirectoryItems(parentPath);
+        const children = await processShortcuts(
+          childItems.map((x) => processDirectory(parentPath, x, level))
+        );
+
+        entries.push(...children);
+      }
     }
   }
 

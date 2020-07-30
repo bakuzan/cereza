@@ -21,6 +21,7 @@ module.exports = {
     'no-console': 'off',
     'no-debugger': 'off',
     '@typescript-eslint/no-empty-interface': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
     'graphql/template-strings': [
       'warn',
       {

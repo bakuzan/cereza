@@ -11,16 +11,12 @@
     </div>
     <ApolloQuery
       :query="require('../graphql/Directory.gql')"
-      :variables="{ path: directoryLocation }"
+      :variables="{ path: directoryLocation, isRecursive }"
     >
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
 
-        <ErrorBlock
-          v-else-if="error"
-          :data="error"
-          message="Failed to fetch directory contents."
-        />
+        <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch directory contents." />
 
         <div v-else-if="data && data.directory" class="result apollo">
           <div class="flex flex--spaced directory__actions">
@@ -31,6 +27,14 @@
               label="Filter current directory..."
               :value="filter"
               @change="onFilter"
+            />
+            <Tickbox
+              id="isRecursive"
+              class-name="check-box"
+              name="isRecursive"
+              label="Include subfolders"
+              :checked="isRecursive"
+              @change="onIsRecursive"
             />
             <div class="flex-spacer"></div>
             <div>
@@ -56,9 +60,7 @@
               :variables="{ path: directoryLocation }"
               @done="() => null"
             >
-              <template
-                v-slot="{ mutate, loading: mutateLoading, error: mutateError }"
-              >
+              <template v-slot="{ mutate, loading: mutateLoading, error: mutateError }">
                 <ApolloQuery
                   :query="require('../graphql/IsDirectoryPinned.gql')"
                   :variables="{ path: directoryLocation }"
@@ -92,11 +94,11 @@
                         :contrast="!pinResult.data.isDirectoryPinned"
                       />
                       {{
-                        pinResult.loading || mutateLoading
-                          ? ''
-                          : pinResult.data.isDirectoryPinned
-                          ? 'Unpin'
-                          : 'Pin'
+                      pinResult.loading || mutateLoading
+                      ? ''
+                      : pinResult.data.isDirectoryPinned
+                      ? 'Unpin'
+                      : 'Pin'
                       }}
                     </Button>
                     <p v-if="mutateError">
@@ -112,50 +114,22 @@
           <div class="result__count">
             Showing
             {{
-              data.directory.entries.filter((x) =>
-                x.name.toLowerCase().includes(filter)
-              ).length
+            data.directory.entries.filter((x) =>
+            x.name.toLowerCase().includes(filter)
+            ).length
             }}
             of
-            {{ data.directory.entries.length }}
+            {{ data.directory.entries.length }}{{ getLevelsMessage(data.directory.entries) }}
           </div>
           <ul class="grid directory-list">
-            <li
-              v-for="item of data.directory.entries.filter((x) =>
-                x.name.toLowerCase().includes(filter)
-              )"
-              :key="item.path"
-              class="directory-item"
-            >
-              <Button
-                class="directory-item__button"
-                @click="handleSelect(item)"
-              >
-                <FolderIcon
-                  v-if="item.isDirectory"
-                  title="Folder"
-                  aria-label="Folder"
-                />
-                <ShortcutIcon
-                  v-else-if="item.isShortcut"
-                  title="Shortcut"
-                  aria-label="Shortcut"
-                />
-                <ImageIcon
-                  v-else-if="item.isImage"
-                  title="Image"
-                  aria-label="Image"
-                />
-                <VideoIcon
-                  v-else-if="item.isVideo"
-                  title="Video"
-                  aria-label="Video"
-                />
-                <FileIcon v-else title="File" aria-label="File" />
-
-                <div class="directory-item__name">{{ item.name }}</div>
-              </Button>
-            </li>
+            <DirectoryListItem
+              v-for="tree of asTree(data.directory.entries)"
+              :key="tree.item.path"
+              :item="tree.item"
+              :children="tree.children"
+              :force-show-children="hasFilter"
+              @select="handleSelect"
+            />
           </ul>
         </div>
 
@@ -177,16 +151,20 @@ import Button from '@/components/Button.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
 import LoadingBouncer from '@/components/LoadingBouncer.vue';
 import Widget from '@/components/Widget.vue';
-import FileIcon from '@/components/Icons/FileIcon.vue';
 import FolderIcon from '@/components/Icons/FolderIcon.vue';
-import ImageIcon from '@/components/Icons/ImageIcon.vue';
-import VideoIcon from '@/components/Icons/VideoIcon.vue';
 import PinIcon from '@/components/Icons/PinIcon.vue';
 import BookIcon from '@/components/Icons/BookIcon.vue';
 import FilmIcon from '@/components/Icons/FilmIcon.vue';
-import ShortcutIcon from '@/components/Icons/ShortcutIcon.vue';
+
 import Crumbs from '@/components/Crumbs.vue';
 import InputBox from '@/components/InputBox.vue';
+import Tickbox from '@/components/Tickbox.vue';
+import DirectoryListItem from '@/components/DirectoryListItem.vue';
+
+interface DirectoryTree {
+  item: DirectoryEntry;
+  children: DirectoryTree[];
+}
 
 @Component({
   components: {
@@ -194,16 +172,14 @@ import InputBox from '@/components/InputBox.vue';
     ErrorBlock,
     LoadingBouncer,
     Widget,
-    FileIcon,
     FolderIcon,
-    ImageIcon,
-    VideoIcon,
     PinIcon,
     BookIcon,
     FilmIcon,
-    ShortcutIcon,
     Crumbs,
-    InputBox
+    InputBox,
+    Tickbox,
+    DirectoryListItem
   },
   metaInfo() {
     return {
@@ -213,15 +189,50 @@ import InputBox from '@/components/InputBox.vue';
 })
 export default class Directory extends Vue {
   private filter = '';
+  private isRecursive = false;
 
   @Watch('$route')
   onRouteChange() {
     this.filter = '';
   }
 
+  // Computed
   get directoryLocation() {
     const loc = this.$route.query['loc'];
     return (loc instanceof Array ? loc.pop() : loc) ?? '';
+  }
+
+  get hasFilter() {
+    return this.filter.length > 0;
+  }
+
+  // Methods
+  private asTree(items: DirectoryEntry[]) {
+    const tree: DirectoryTree[] = items.map((item) => ({ item, children: [] }));
+
+    for (const leaf of tree) {
+      leaf.children = tree.filter(
+        (x) =>
+          x.item.parentName === leaf.item.name &&
+          x.item.name.toLowerCase().includes(this.filter)
+      );
+    }
+
+    return tree.filter(
+      (x) =>
+        x.item.level === 0 &&
+        (x.children.length || x.item.name.toLowerCase().includes(this.filter))
+    );
+  }
+
+  private getLevelsMessage(items: DirectoryEntry[]) {
+    const levels = new Set(
+      items
+        .filter((x) => x.name.toLowerCase().includes(this.filter))
+        .map((x) => x.level)
+    );
+
+    return this.isRecursive ? ` across ${levels.size} levels` : '';
   }
 
   private handleSelect(item: DirectoryEntry) {
@@ -254,6 +265,10 @@ export default class Directory extends Vue {
 
   private onFilter({ value }: { value: string }) {
     this.$set(this, 'filter', value.toLowerCase());
+  }
+
+  private onIsRecursive() {
+    this.isRecursive = !this.isRecursive;
   }
 
   private onUpdate(client: CRZDataProxy) {
@@ -302,32 +317,9 @@ export default class Directory extends Vue {
 }
 
 .directory-list {
-  grid-auto-rows: 1fr;
+  grid-auto-rows: auto;
   grid-auto-columns: 1fr;
   gap: 5px;
-}
-
-.directory-item {
-  display: flex;
-  align-items: center;
-
-  &__button {
-    width: 100%;
-
-    &:focus,
-    &:hover,
-    &:active {
-      .directory-item__name {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  &__name {
-    font-size: 1.2rem;
-    white-space: pre-line;
-    text-align: left;
-  }
 }
 
 .pin-button,
@@ -369,8 +361,7 @@ export default class Directory extends Vue {
 </style>
 
 <style lang="scss">
-.action-button,
-.directory-item__button {
+.action-button {
   &:focus,
   &:hover,
   &:active {

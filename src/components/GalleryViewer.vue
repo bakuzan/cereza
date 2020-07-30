@@ -50,6 +50,7 @@ import { ApolloResponse } from '@i/ApolloResponse';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
 import { CRZImage } from '@i/CRZImage';
 import { GalleryResponse } from '@i/GalleryResponse';
+import { GalleryView } from '@i/GalleryView';
 
 import Button from '@/components/Button.vue';
 import GoToWidget from '@/components/GoToWidget.vue';
@@ -59,10 +60,7 @@ import { OnTop } from '@/directives/OnTop';
 import calculateGalleryPage from '@/utils/calculateGalleryPage';
 import { ReaderMode } from '@/constants';
 import { getPageFromHash } from '../utils';
-
-interface GalleryView {
-  gallery: GalleryResponse;
-}
+import { isGalleryView } from '@/utils/guards';
 
 @Component({
   components: {
@@ -136,10 +134,10 @@ export default class GalleryViewer extends Vue {
         page,
         size: 25
       },
-      updateQuery: (prev: GalleryView, result: any) => {
-        const fetchMoreResult = result.fetchMoreResult as GalleryView;
+      updateQuery: (prev: GalleryView, result) => {
+        const fetchMoreResult = result.fetchMoreResult;
 
-        if (!fetchMoreResult) {
+        if (!isGalleryView(fetchMoreResult)) {
           this.hasMore = false;
           return prev;
         }

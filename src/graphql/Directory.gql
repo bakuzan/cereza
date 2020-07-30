@@ -1,10 +1,12 @@
-query Directory($path: String!) {
-  directory(path: $path) {
+query Directory($path: String!, $isRecursive: Boolean) {
+  directory(path: $path, isRecursive: $isRecursive) {
     canGallery
     canReel
     entries {
       name
       path
+      level
+      parentName
       isDirectory
       isFile
       isImage

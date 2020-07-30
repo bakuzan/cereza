@@ -9,7 +9,7 @@ type Query {
   disks: [Disk]!
 
   "Fetch directory contents"
-  directory(path: String!): DirectoryResponse
+  directory(path: String!, isRecursive: Boolean): DirectoryResponse
 
   "Fetch gallery directory contents"
   gallery(path: String!, page: Int!, size: Int!): GalleryResponse

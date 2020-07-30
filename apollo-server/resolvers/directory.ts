@@ -16,7 +16,8 @@ const writeFileAsync = promisify(fs.writeFile);
 export default createResolver({
   Query: {
     async directory(_, args: DirectoryArgs, context) {
-      const entries = await context.readDirectory(args.path);
+      const isRecursive = args.isRecursive ?? false;
+      const entries = await context.readDirectory(args.path, isRecursive);
 
       return {
         canGallery: context.canGallery(entries),
@@ -31,7 +32,7 @@ export default createResolver({
       };
     },
     async gallery(_, args: DirectoryArgs & PagedArgs, context) {
-      const entries = await context.readDirectory(args.path);
+      const entries = await context.readDirectory(args.path, false);
       const canGallery = context.canGallery(entries);
       const folderName = pathToFolderName(args.path);
       const totalImagesCount = entries.filter(filterToFiles).length;
@@ -52,7 +53,7 @@ export default createResolver({
       };
     },
     async reel(_, args: DirectoryArgs, context) {
-      const entries = await context.readDirectory(args.path);
+      const entries = await context.readDirectory(args.path, false);
       const canReel = context.canReel(entries);
       const folderName = pathToFolderName(args.path);
       let videos: CRZVideo[] = [];

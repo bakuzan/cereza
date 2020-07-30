@@ -6,6 +6,7 @@ type Disk {
 type DirectoryEntry {
   name: String
   path: String
+  level: Int
   targetPath: String
   parentName: String
   isDirectory: Boolean
