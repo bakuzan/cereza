@@ -11,6 +11,7 @@ import {
   isDirectory
 } from './checkFileType';
 import getShortcutTargetPath from '@s/utils/getShortcutTargetPath';
+import { maximumRecursionLevel } from '@s/constants';
 
 const readdir = promisify(fs.readdir);
 
@@ -96,6 +97,10 @@ export default async function readDirectory(
       if (entry.isDirectory) {
         const parentPath = entry.targetPath ?? entry.path;
         const level = entry.level + 1;
+
+        if (level > maximumRecursionLevel) {
+          continue;
+        }
 
         const childItems = await getDirectoryItems(parentPath);
         const children = await processShortcuts(

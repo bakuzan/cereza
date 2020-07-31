@@ -5,4 +5,6 @@ export enum Environment {
   Production = 'production'
 }
 
+export const maximumRecursionLevel = 4;
+
 export const sysFiles = ['Thumbs.db'];
