@@ -15,7 +15,7 @@ type Query {
   gallery(path: String!, page: Int!, size: Int!): GalleryResponse
 
   "Fetch reel directory contents"
-  reel(path: String!): ReelResponse
+  reel(path: String!, isRecursive: Boolean): ReelResponse
 
   "Activate path with default action"
   action(path: String!): ConfirmationResponse

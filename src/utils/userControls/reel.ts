@@ -7,6 +7,7 @@ interface ReelOptions {
   onPlaybackSpeedChange(speed: number): void;
   onRandom(): void;
   onToggleAutoCycle(): void;
+  onToggleRandomisedCycle(): void;
   selector: string;
 }
 
@@ -39,6 +40,10 @@ export default function initReelControls(options: ReelOptions): RemoveListener {
     switch (event.key) {
       case EventKey.KeyA:
         options.onToggleAutoCycle();
+        break;
+
+      case EventKey.KeyZ:
+        options.onToggleRandomisedCycle();
         break;
 
       case EventKey.KeyP:
@@ -98,7 +103,7 @@ export default function initReelControls(options: ReelOptions): RemoveListener {
 
       // Skip backward
       case EventKey.Comma: {
-        seekToPoint(player, -10);
+        seekToPoint(player, -5);
         break;
       }
       case EventKey.AngleLeft: {
@@ -112,7 +117,7 @@ export default function initReelControls(options: ReelOptions): RemoveListener {
 
       // Skip forward
       case EventKey.Fullstop: {
-        seekToPoint(player, 10);
+        seekToPoint(player, 5);
         break;
       }
       case EventKey.AngleRight: {

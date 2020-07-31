@@ -1,3 +1,4 @@
+import path from 'path';
 import { CRZVideo } from '@i/CRZVideo';
 import { DirectoryEntry } from '@i/DirectoryEntry';
 
@@ -9,7 +10,8 @@ const getVideoUrl = (url: string) =>
   `${base.replace('/graphql', '')}/video?key=${obfuscate(url)}`;
 
 export default async function readVideos(
-  entries: DirectoryEntry[]
+  entries: DirectoryEntry[],
+  folderName: string
 ): Promise<CRZVideo[]> {
   const items = entries.filter(filterToFiles);
   const videos: CRZVideo[] = [];
@@ -20,6 +22,7 @@ export default async function readVideos(
     const url = getVideoUrl(filePath);
 
     const fullName = entry.name;
+    const folderName = path.basename(path.dirname(fullName));
     const name = fullName
       .split('.')
       .slice(0, -1)
@@ -27,11 +30,22 @@ export default async function readVideos(
 
     videos.push({
       name,
+      folderName,
       fullName,
       extension,
       url
     });
   }
 
-  return videos.sort((a, b) => a.name.localeCompare(b.name));
+  return videos.sort((a, b) => {
+    const isATop = a.folderName === folderName;
+    const isBTop = b.folderName === folderName;
+
+    return isATop && !isBTop
+      ? 1
+      : !isATop && isBTop
+      ? -1
+      : a.folderName.localeCompare(b.folderName) ||
+        a.name.localeCompare(b.name);
+  });
 }

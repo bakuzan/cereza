@@ -36,6 +36,7 @@ type GalleryResponse {
 }
 
 type CRZVideo {
+  folderName: String
   fullName: String
   name: String
   extension: String

@@ -21,19 +21,28 @@
       </div>
       <h3 class="video__name">
         {{ activeVideo ? activeVideo.name : '' }}
-        <div class="video__playback-speed">
-          ({{ meta.playbackSpeed }}x speed)
-        </div>
+        <div class="video__playback-speed">({{ meta.playbackSpeed }}x speed)</div>
       </h3>
       <div class="video__controls controls">
-        <Tickbox
-          id="autoCycle"
-          class-name="controls__tickbox"
-          name="autoCycle"
-          label="Auto cycle"
-          :checked="autoCycle"
-          @change="onAutoCycle"
-        />
+        <div>
+          <Tickbox
+            id="autoCycle"
+            class-name="controls__tickbox"
+            name="autoCycle"
+            label="Auto cycle"
+            :checked="autoCycle"
+            @change="onAutoCycle"
+          />
+          <Tickbox
+            v-if="autoCycle"
+            id="randomCycle"
+            class-name="controls__tickbox"
+            name="randomCycle"
+            label="Randomise cycle"
+            :checked="randomCycle"
+            @change="onRandomCycle"
+          />
+        </div>
         <div class="flex-spacer"></div>
         <Button
           v-if="activeVideo !== null"
@@ -48,7 +57,7 @@
           v-if="activeVideo !== null"
           class="controls__button"
           :primary="true"
-          :disabled="activeIndex === data.length - 1"
+          :disabled="activeIndex === filteredData.length - 1"
           @click="onChangeVideo(1)"
         >
           Next
@@ -69,29 +78,35 @@
         @change="onFilter"
         @keypress.stop="() => null"
       />
-      <ul class="videos">
+      <ul class="reel-viewer__directory">
         <li
-          v-for="item of data.filter((x) =>
-            x.name.toLowerCase().includes(filter)
-          )"
-          :key="item.fullName"
-          class="videos__item"
+          v-for="folder of directory"
+          :key="folder.folderName"
+          class="reel-viewer__directory-item"
         >
-          <Button
-            :class="{
-              videos__button: true,
-              'videos__button--active': isActive(item)
-            }"
-            :title="item.name"
-            :aria-label="
-              `${item.name}${isActive(item) ? ' : active video' : ''}`
-            "
-            :disabled="isActive(item)"
-            @click="onVideoSelect(item)"
-          >
-            <PlayIcon :show="isActive(item)" :contrast="true" />
-            <div :aria-hidden="true">{{ item.name }}</div>
-          </Button>
+          <h4
+            v-if="folderName !== folder.folderName"
+            class="reel-viewer__directory-name"
+          >{{ folder.folderName }}</h4>
+          <ul :class="{ videos: true, 'videos--no-padding': folderName === folder.folderName }">
+            <li v-for="item of folder.items" :key="item.fullName" class="videos__item">
+              <Button
+                :class="{
+                  videos__button: true,
+                  'videos__button--active': isActive(item)
+                }"
+                :title="item.name"
+                :aria-label="
+                `${item.name}${isActive(item) ? ' : active video' : ''}`
+                "
+                :disabled="isActive(item)"
+                @click="onVideoSelect(item)"
+              >
+                <PlayIcon :show="isActive(item)" :contrast="true" />
+                <div :aria-hidden="true">{{ item.name }}</div>
+              </Button>
+            </li>
+          </ul>
         </li>
       </ul>
     </div>
@@ -132,8 +147,10 @@ const defaultMeta = {
 })
 export default class ReelViewer extends Vue {
   @Prop({ default: [] }) readonly data!: CRZVideo[];
+  @Prop({ default: '' }) readonly folderName!: string;
 
   private autoCycle = false;
+  private randomCycle = false;
   private filter = '';
   private destroyListeners: (() => void) | null = null;
   private removeControls: (() => void) | null = null;
@@ -147,6 +164,7 @@ export default class ReelViewer extends Vue {
         (this.meta.playbackSpeed = speed),
       onRandom: this.onRandom,
       onToggleAutoCycle: this.onAutoCycle,
+      onToggleRandomisedCycle: this.onRandomCycle,
       selector: '#videoPlayer'
     });
   }
@@ -167,8 +185,21 @@ export default class ReelViewer extends Vue {
     return (selected instanceof Array ? selected.pop() : selected) ?? '';
   }
 
+  get filteredData() {
+    return this.data.filter((x) => x.name.toLowerCase().includes(this.filter));
+  }
+
+  get directory() {
+    return Array.from(new Set(this.filteredData.map((x) => x.folderName)))
+      .map((folderName) => ({
+        folderName,
+        items: this.filteredData.filter((x) => x.folderName === folderName)
+      }))
+      .filter((x) => x.items.length);
+  }
+
   get activeIndex() {
-    return this.data.findIndex(
+    return this.filteredData.findIndex(
       (x) => this.selected && x.fullName === this.selected
     );
   }
@@ -178,7 +209,7 @@ export default class ReelViewer extends Vue {
       return null;
     }
 
-    return this.data[this.activeIndex] ?? null;
+    return this.filteredData[this.activeIndex] ?? null;
   }
 
   // Methods
@@ -211,6 +242,10 @@ export default class ReelViewer extends Vue {
     if (this.autoCycle && this.destroyListeners === null) {
       this.setupListeners();
     }
+  }
+
+  private onRandomCycle() {
+    this.randomCycle = this.autoCycle && !this.randomCycle;
   }
 
   private onVideoSelect(item: CRZVideo) {
@@ -257,6 +292,8 @@ export default class ReelViewer extends Vue {
 
     if (isShort && isBelowAccumulativeLimit) {
       vid.play();
+    } else if (this.randomCycle) {
+      this.onRandom();
     } else {
       this.onChangeVideo(1);
     }

@@ -18,6 +18,7 @@ export enum EventKey {
   KeyP = 'p',
   KeyR = 'r',
   KeyS = 's',
+  KeyZ = 'z',
   Minus = '-',
   SlashForward = '/',
   SlashBackward = '\\',

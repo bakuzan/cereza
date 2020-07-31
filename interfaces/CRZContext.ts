@@ -19,6 +19,9 @@ export interface CRZContext {
     start: number,
     end: number
   ): Promise<Array<CRZImage>>;
-  readVideos(entries: DirectoryEntry[]): Promise<Array<CRZVideo>>;
+  readVideos(
+    entries: DirectoryEntry[],
+    folderName: string
+  ): Promise<Array<CRZVideo>>;
   Pinned: Repository<Pinned>;
 }

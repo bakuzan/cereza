@@ -53,13 +53,14 @@ export default createResolver({
       };
     },
     async reel(_, args: DirectoryArgs, context) {
-      const entries = await context.readDirectory(args.path, false);
+      const isRecursive = args.isRecursive ?? false;
+      const entries = await context.readDirectory(args.path, isRecursive);
       const canReel = context.canReel(entries);
       const folderName = pathToFolderName(args.path);
       let videos: CRZVideo[] = [];
 
       if (canReel) {
-        videos = await context.readVideos(entries);
+        videos = await context.readVideos(entries, folderName);
       }
 
       return {
