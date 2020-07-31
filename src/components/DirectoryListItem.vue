@@ -1,13 +1,33 @@
 <template>
   <li class="directory-item">
     <div class="directory-item__content">
-      <Button v-if="hasChildren" class="directory-item__toggle" @click="toggleChildren()">
-        <ArrowDownIcon v-if="isExpanded" title="Collapse children" aria-label="Collapse children" />
-        <ArrowRightIcon v-else title="Expand children" aria-label="Expand children" />
+      <Button
+        v-if="hasChildren"
+        class="directory-item__toggle"
+        @click="toggleChildren()"
+      >
+        <ArrowDownIcon
+          v-if="isExpanded"
+          title="Collapse children"
+          aria-label="Collapse children"
+        />
+        <ArrowRightIcon
+          v-else
+          title="Expand children"
+          aria-label="Expand children"
+        />
       </Button>
       <Button class="directory-item__button" @click="onSelect(item)">
-        <FolderIcon v-if="item.isDirectory" title="Folder" aria-label="Folder" />
-        <ShortcutIcon v-else-if="item.isShortcut" title="Shortcut" aria-label="Shortcut" />
+        <FolderIcon
+          v-if="item.isDirectory"
+          title="Folder"
+          aria-label="Folder"
+        />
+        <ShortcutIcon
+          v-else-if="item.isShortcut"
+          title="Shortcut"
+          aria-label="Shortcut"
+        />
         <ImageIcon v-else-if="item.isImage" title="Image" aria-label="Image" />
         <VideoIcon v-else-if="item.isVideo" title="Video" aria-label="Video" />
         <FileIcon v-else title="File" aria-label="File" />
@@ -79,6 +99,9 @@ export default class DirectoryListItem extends Vue {
     return item;
   }
 }
+
+// Globally register to allow recursive usage!
+Vue.component('DirectoryListItem', DirectoryListItem);
 </script>
 
 <style scoped lang="scss">
