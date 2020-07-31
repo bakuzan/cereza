@@ -7,21 +7,27 @@
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
 
-        <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch reel contents." />
+        <ErrorBlock
+          v-else-if="error"
+          :data="error"
+          message="Failed to fetch reel contents."
+        />
 
         <div v-else-if="data && data.reel" class="result apollo">
           <div class="reel__header">
             <h2 class="page__title">{{ data.reel.folderName }}</h2>
 
             <div class="flex-spacer"></div>
-            <Tickbox
-              id="isRecursive"
-              class-name="check-box"
-              name="isRecursive"
-              label="Include subfolders"
-              :checked="isRecursive"
-              @change="onIsRecursive"
-            />
+            <div class="reel__option">
+              <Tickbox
+                id="isRecursive"
+                class-name="recursive-check-box"
+                name="isRecursive"
+                label="Include subfolders"
+                :checked="isRecursive"
+                @change="onIsRecursive"
+              />
+            </div>
             <Help title="Reel keyboard controls">
               <table class="shortcuts-table">
                 <thead>
@@ -31,7 +37,11 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="item of reelShortcuts" :key="item.name" class="shortcuts-table__row">
+                  <tr
+                    v-for="item of reelShortcuts"
+                    :key="item.name"
+                    class="shortcuts-table__row"
+                  >
                     <td>{{ item.name }}</td>
                     <td style="text-align:center;">{{ item.shortcut }}</td>
                   </tr>
@@ -48,11 +58,16 @@
             </Button>
           </div>
           <div v-if="data.reel.canReel" class="reel-pane">
-            <ReelViewer :folder-name="data.reel.folderName" :data="data.reel.videos" />
+            <ReelViewer
+              :folder-name="data.reel.folderName"
+              :data="data.reel.videos"
+            />
           </div>
           <div v-else>
             <p>This directory is not a valid reel viewer directory.</p>
-            <Button class="reel__button" :link="true" @click="onCloseReel()">Back to directory</Button>
+            <Button class="reel__button" :link="true" @click="onCloseReel()"
+              >Back to directory</Button
+            >
           </div>
         </div>
 
@@ -174,5 +189,16 @@ export default class Reel extends Vue {
   &__row {
     padding: 2px 0;
   }
+}
+</style>
+
+<style lang="scss">
+.recursive-check-box {
+  --tickbox-default-colour: var(--accent-colour);
+  margin: auto 0;
+}
+
+.reel__option .input-container {
+  display: flex;
 }
 </style>

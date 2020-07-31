@@ -21,7 +21,9 @@
       </div>
       <h3 class="video__name">
         {{ activeVideo ? activeVideo.name : '' }}
-        <div class="video__playback-speed">({{ meta.playbackSpeed }}x speed)</div>
+        <div class="video__playback-speed">
+          ({{ meta.playbackSpeed }}x speed)
+        </div>
       </h3>
       <div class="video__controls controls">
         <div>
@@ -87,9 +89,20 @@
           <h4
             v-if="folderName !== folder.folderName"
             class="reel-viewer__directory-name"
-          >{{ folder.folderName }}</h4>
-          <ul :class="{ videos: true, 'videos--no-padding': folderName === folder.folderName }">
-            <li v-for="item of folder.items" :key="item.fullName" class="videos__item">
+          >
+            {{ folder.folderName }}
+          </h4>
+          <ul
+            :class="{
+              videos: true,
+              'videos--no-padding': folderName === folder.folderName
+            }"
+          >
+            <li
+              v-for="item of folder.items"
+              :key="item.fullName"
+              class="videos__item"
+            >
               <Button
                 :class="{
                   videos__button: true,
@@ -97,7 +110,7 @@
                 }"
                 :title="item.name"
                 :aria-label="
-                `${item.name}${isActive(item) ? ' : active video' : ''}`
+                  `${item.name}${isActive(item) ? ' : active video' : ''}`
                 "
                 :disabled="isActive(item)"
                 @click="onVideoSelect(item)"
@@ -222,14 +235,15 @@ export default class ReelViewer extends Vue {
   }
 
   private onRandom() {
-    const randomIndex = getRandomInt(0, this.data.length - 1);
-    const item = this.data[randomIndex];
+    const maxNumber = this.filteredData.length - 1;
+    const randomIndex = getRandomInt(0, maxNumber);
+    const item = this.filteredData[randomIndex];
     this.onVideoSelect(item);
   }
 
   private onChangeVideo(diff: number) {
     const newIndex = this.activeIndex + diff;
-    const item = this.data[newIndex];
+    const item = this.filteredData[newIndex];
 
     if (item) {
       this.onVideoSelect(item);
@@ -328,6 +342,20 @@ $max-width: 100%;
     grid-area: vs;
     border: 1px dashed var(--accent-colour);
   }
+
+  &__directory {
+    list-style-type: none;
+    max-height: calc(
+      100vh - (var(--header-height) * 2) - #{$filter-box-height}
+    );
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+  }
+
+  &__directory-name {
+    margin: 1em 0.5em;
+  }
 }
 
 .reel-viewer-active-video {
@@ -369,10 +397,8 @@ $max-width: 100%;
 
 .videos {
   list-style-type: none;
-  max-height: calc(100vh - (var(--header-height) * 2) - #{$filter-box-height});
   padding: 0;
   margin: 0;
-  overflow: auto;
 
   &__item {
     border: 1px solid transparent;

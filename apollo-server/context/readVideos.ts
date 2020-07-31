@@ -2,7 +2,7 @@ import path from 'path';
 import { CRZVideo } from '@i/CRZVideo';
 import { DirectoryEntry } from '@i/DirectoryEntry';
 
-import { getPathExtension, filterToFiles } from '../utils';
+import { getPathExtension, filterToFiles, distinct } from '../utils';
 import { obfuscate } from '../utils/obfuscate';
 
 const base = process.env.VUE_APP_GRAPHQL_HTTP || '';
@@ -22,7 +22,7 @@ export default async function readVideos(
     const url = getVideoUrl(filePath);
 
     const fullName = entry.name;
-    const folderName = path.basename(path.dirname(fullName));
+    const folderName = path.basename(path.dirname(entry.path));
     const name = fullName
       .split('.')
       .slice(0, -1)
@@ -37,14 +37,14 @@ export default async function readVideos(
     });
   }
 
-  return videos.sort((a, b) => {
+  return videos.filter(distinct((x) => x.url)).sort((a, b) => {
     const isATop = a.folderName === folderName;
     const isBTop = b.folderName === folderName;
 
     return isATop && !isBTop
-      ? 1
-      : !isATop && isBTop
       ? -1
+      : !isATop && isBTop
+      ? 1
       : a.folderName.localeCompare(b.folderName) ||
         a.name.localeCompare(b.name);
   });

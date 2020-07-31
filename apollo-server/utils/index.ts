@@ -16,3 +16,9 @@ export const getPathExtension = (filePath: string) =>
 
 export const filterToFiles = (x: DirectoryEntry) =>
   x.isFile && !sysFiles.includes(x.name);
+
+export const distinct = <T>(picker: (x: T) => any) => (
+  x: T,
+  index: number,
+  arr: T[]
+) => arr.findIndex((y) => picker(x) === picker(y)) === index;
