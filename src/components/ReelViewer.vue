@@ -100,7 +100,7 @@
           >
             <li
               v-for="item of folder.items"
-              :key="item.fullName"
+              :key="item.key"
               class="videos__item"
             >
               <Button
@@ -213,7 +213,7 @@ export default class ReelViewer extends Vue {
 
   get activeIndex() {
     return this.filteredData.findIndex(
-      (x) => this.selected && x.fullName === this.selected
+      (x) => this.selected && x.key === this.selected
     );
   }
 
@@ -231,7 +231,7 @@ export default class ReelViewer extends Vue {
   }
 
   private isActive(item: CRZVideo) {
-    return this.activeVideo && this.activeVideo.fullName === item.fullName;
+    return this.activeVideo && this.activeVideo.key === item.key;
   }
 
   private onRandom() {
@@ -267,7 +267,7 @@ export default class ReelViewer extends Vue {
       name: 'Reel',
       query: {
         ...this.$route.query,
-        selected: item.fullName
+        selected: item.key
       }
     });
 

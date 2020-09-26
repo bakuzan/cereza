@@ -6,8 +6,8 @@ import { getPathExtension, filterToFiles, distinct } from '../utils';
 import { obfuscate } from '../utils/obfuscate';
 
 const base = process.env.VUE_APP_GRAPHQL_HTTP || '';
-const getVideoUrl = (url: string) =>
-  `${base.replace('/graphql', '')}/video?key=${obfuscate(url)}`;
+const getVideoUrl = (key: string) =>
+  `${base.replace('/graphql', '')}/video?key=${key}`;
 
 export default async function readVideos(
   entries: DirectoryEntry[],
@@ -19,7 +19,8 @@ export default async function readVideos(
   for (const entry of items) {
     const filePath = entry.targetPath ?? entry.path;
     const extension = getPathExtension(filePath);
-    const url = getVideoUrl(filePath);
+    const key = obfuscate(filePath);
+    const url = getVideoUrl(key);
 
     const fullName = entry.name;
     const folderName = path.basename(path.dirname(entry.path));
@@ -29,6 +30,7 @@ export default async function readVideos(
       .join('.');
 
     videos.push({
+      key,
       name,
       folderName,
       fullName,

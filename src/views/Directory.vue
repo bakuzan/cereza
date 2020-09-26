@@ -16,7 +16,11 @@
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
 
-        <ErrorBlock v-else-if="error" :data="error" message="Failed to fetch directory contents." />
+        <ErrorBlock
+          v-else-if="error"
+          :data="error"
+          message="Failed to fetch directory contents."
+        />
 
         <div v-else-if="data && data.directory" class="result apollo">
           <div class="flex flex--spaced directory__actions">
@@ -60,7 +64,9 @@
               :variables="{ path: directoryLocation }"
               @done="() => null"
             >
-              <template v-slot="{ mutate, loading: mutateLoading, error: mutateError }">
+              <template
+                v-slot="{ mutate, loading: mutateLoading, error: mutateError }"
+              >
                 <ApolloQuery
                   :query="require('../graphql/IsDirectoryPinned.gql')"
                   :variables="{ path: directoryLocation }"
@@ -94,11 +100,11 @@
                         :contrast="!pinResult.data.isDirectoryPinned"
                       />
                       {{
-                      pinResult.loading || mutateLoading
-                      ? ''
-                      : pinResult.data.isDirectoryPinned
-                      ? 'Unpin'
-                      : 'Pin'
+                        pinResult.loading || mutateLoading
+                          ? ''
+                          : pinResult.data.isDirectoryPinned
+                          ? 'Unpin'
+                          : 'Pin'
                       }}
                     </Button>
                     <p v-if="mutateError">
@@ -114,12 +120,13 @@
           <div class="result__count">
             Showing
             {{
-            data.directory.entries.filter((x) =>
-            x.name.toLowerCase().includes(filter)
-            ).length
+              data.directory.entries.filter((x) =>
+                x.name.toLowerCase().includes(filter)
+              ).length
             }}
             of
-            {{ data.directory.entries.length }}{{ getLevelsMessage(data.directory.entries) }}
+            {{ data.directory.entries.length
+            }}{{ getLevelsMessage(data.directory.entries) }}
           </div>
           <ul class="grid directory-list">
             <DirectoryListItem

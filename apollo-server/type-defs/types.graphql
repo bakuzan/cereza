@@ -41,6 +41,7 @@ type CRZVideo {
   name: String
   extension: String
   url: String
+  key: String
 }
 
 type ReelResponse {
