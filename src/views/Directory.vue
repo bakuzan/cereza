@@ -71,17 +71,16 @@
                   :query="require('../graphql/IsDirectoryPinned.gql')"
                   :variables="{ path: directoryLocation }"
                 >
-                  <template slot-scope="{ result: pinResult }">
+                  <template slot-scope="{ result: pinRes }">
                     <Button
-                      v-if="pinResult && pinResult.data"
+                      v-if="pinRes && pinRes.data"
                       :class="{
                         'pin-button': true,
-                        'pin-button--pinned': pinResult.data.isDirectoryPinned,
-                        'pin-button--unpinned': !pinResult.data
-                          .isDirectoryPinned
+                        'pin-button--pinned': pinRes.data.isDirectoryPinned,
+                        'pin-button--unpinned': !pinRes.data.isDirectoryPinned
                       }"
                       :primary="true"
-                      :disabled="pinResult.loading || mutateLoading"
+                      :disabled="pinRes.loading || mutateLoading"
                       @click="
                         mutate({
                           update: onUpdate,
@@ -95,14 +94,14 @@
                       "
                     >
                       <PinIcon
-                        v-if="!pinResult.loading && !mutateLoading"
+                        v-if="!pinRes.loading && !mutateLoading"
                         :fill="true"
-                        :contrast="!pinResult.data.isDirectoryPinned"
+                        :contrast="!pinRes.data.isDirectoryPinned"
                       />
                       {{
-                        pinResult.loading || mutateLoading
+                        pinRes.loading || mutateLoading
                           ? ''
-                          : pinResult.data.isDirectoryPinned
+                          : pinRes.data.isDirectoryPinned
                           ? 'Unpin'
                           : 'Pin'
                       }}
@@ -198,6 +197,12 @@ export default class Directory extends Vue {
   private filter = '';
   private isRecursive = false;
 
+  beforeMount() {
+    const rec = this.$route.query['recursive'];
+    const value = (rec instanceof Array ? rec.pop() : rec) ?? false;
+    this.isRecursive = value === 'true';
+  }
+
   @Watch('$route')
   onRouteChange() {
     this.filter = '';
@@ -289,7 +294,9 @@ export default class Directory extends Vue {
 
   private onReel() {
     const param = window.encodeURIComponent(this.directoryLocation);
-    this.$router.push(`/reel-viewer?loc=${param}`);
+    this.$router.push(
+      `/reel-viewer?loc=${param}&recursive=${this.isRecursive}`
+    );
   }
 }
 </script>

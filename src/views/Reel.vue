@@ -32,7 +32,7 @@
               <table class="shortcuts-table">
                 <thead>
                   <tr>
-                    <th style="text-align:left;">Control</th>
+                    <th style="text-align: left">Control</th>
                     <th>Shortcut</th>
                   </tr>
                 </thead>
@@ -43,7 +43,7 @@
                     class="shortcuts-table__row"
                   >
                     <td>{{ item.name }}</td>
-                    <td style="text-align:center;">{{ item.shortcut }}</td>
+                    <td style="text-align: center">{{ item.shortcut }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -130,6 +130,12 @@ export default class Reel extends Vue {
     { name: 'Skip +60s', shortcut: '/' }
   ];
 
+  beforeMount() {
+    const rec = this.$route.query['recursive'];
+    const value = (rec instanceof Array ? rec.pop() : rec) ?? false;
+    this.isRecursive = value === 'true';
+  }
+
   // Computed
   get directoryLocation() {
     const loc = this.$route.query['loc'];
@@ -143,7 +149,7 @@ export default class Reel extends Vue {
 
   private onCloseReel() {
     const param = window.encodeURIComponent(this.directoryLocation);
-    this.$router.push(`/directory?loc=${param}`);
+    this.$router.push(`/directory?loc=${param}&recursive=${this.isRecursive}`);
   }
 }
 </script>
