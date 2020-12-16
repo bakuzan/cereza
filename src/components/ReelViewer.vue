@@ -413,7 +413,10 @@ $max-width: 100%;
     width: 100%;
 
     &--active[disabled],
+    &--active[disabled]:focus,
     &--active[disabled]:hover {
+      --disabled-colour: var(--accent-colour);
+
       background-color: var(--accent-colour);
       color: var(--accent-contrast);
     }
