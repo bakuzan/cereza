@@ -9,6 +9,7 @@ query Directory($path: String!, $isRecursive: Boolean) {
       parentName
       isDirectory
       isFile
+      isAudio
       isImage
       isVideo
       isShortcut

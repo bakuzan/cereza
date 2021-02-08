@@ -8,7 +8,8 @@ import {
   isShortcut,
   isVideo,
   isFile,
-  isDirectory
+  isDirectory,
+  isAudio
 } from './checkFileType';
 import getShortcutTargetPath from '@s/utils/getShortcutTargetPath';
 import { maximumRecursionLevel } from '@s/constants';
@@ -39,6 +40,7 @@ function processDirectory(
     parentName,
     isDirectory,
     isFile: item.isFile(),
+    isAudio: isAudio(item.name),
     isImage: isImage(item.name),
     isVideo: isVideo(item.name),
     isShortcut: isShortcut(item.name)
@@ -62,6 +64,7 @@ async function processShortcuts(items: DirectoryEntry[]) {
           ...x,
           isDirectory: targetPath ? isDirectory(targetPath) : x.isDirectory,
           isFile: targetPath ? isFile(targetPath) : x.isFile,
+          isAudio: targetPath ? isAudio(targetPath) : x.isAudio,
           isImage: targetPath ? isImage(targetPath) : x.isImage,
           isVideo: targetPath ? isVideo(targetPath) : x.isVideo,
           targetPath

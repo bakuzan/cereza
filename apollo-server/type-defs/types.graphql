@@ -11,6 +11,7 @@ type DirectoryEntry {
   parentName: String
   isDirectory: Boolean
   isFile: Boolean
+  isAudio: Boolean
   isImage: Boolean
   isVideo: Boolean
   isShortcut: Boolean
