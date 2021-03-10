@@ -62,6 +62,8 @@
               :folder-name="data.reel.folderName"
               :data="data.reel.media"
               :sort="sort"
+              :isAudioReel="data.reel.isAudioReel"
+              :isVideoReel="data.reel.isVideoReel"
               @updateSort="onSort"
             />
           </div>

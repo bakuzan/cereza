@@ -11,14 +11,19 @@ interface ReelOptions {
   selector: string;
 }
 
-const getVideo = (sel: string) => document.querySelector<HTMLVideoElement>(sel);
+const getVideo = (sel: string) =>
+  document.querySelector<HTMLVideoElement | HTMLAudioElement>(sel);
+
 const playbackChangeKeys: string[] = [
   EventKey.Minus,
   EventKey.Equals,
   EventKey.Key0
 ];
 
-function seekToPoint(player: HTMLVideoElement, seconds: number) {
+function seekToPoint(
+  player: HTMLVideoElement | HTMLAudioElement,
+  seconds: number
+) {
   let seekToTime = player.currentTime + seconds;
 
   if (seekToTime < 0) {

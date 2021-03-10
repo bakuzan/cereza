@@ -85,6 +85,8 @@ export default createResolver({
 
       return {
         canReel,
+        isAudioReel: entries.some((x) => x.isAudio),
+        isVideoReel: entries.some((x) => x.isVideo),
         folderName,
         media
       };

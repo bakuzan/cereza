@@ -68,6 +68,8 @@ type CRZMedia {
 
 type ReelResponse {
   canReel: Boolean
+  isAudioReel: Boolean
+  isVideoReel: Boolean
   folderName: String
   media: [CRZMedia]!
 }

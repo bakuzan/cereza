@@ -3,13 +3,13 @@
     <div class="reel-viewer__content video">
       <div class="video__player">
         <video
-          v-if="activeVideo === null"
+          v-if="activeVideo === null && isVideoReel"
           id="videoPlayer"
           class="reel-viewer-active-video"
           controls
         ></video>
         <video
-          v-else
+          v-else-if="activeVideo && isVideoReel"
           id="videoPlayer"
           class="reel-viewer-active-video"
           controls
@@ -18,6 +18,22 @@
           :src="activeVideo.url"
           :type="`video/${activeVideo.extension}`"
         ></video>
+        <audio
+          v-if="activeVideo === null && isAudioReel"
+          id="videoPlayer"
+          class="reel-viewer-active-video"
+          controls
+        ></audio>
+        <audio
+          v-else-if="activeVideo && isAudioReel"
+          id="videoPlayer"
+          class="reel-viewer-active-video"
+          controls
+          preload="auto"
+          :autoplay="autoCycle"
+          :src="activeVideo.url"
+          :type="`audio/${activeVideo.extension}`"
+        ></audio>
       </div>
       <h3 class="video__name">
         {{ activeVideo ? activeVideo.name : '' }}
@@ -181,6 +197,8 @@ const defaultMeta = {
 export default class ReelViewer extends Vue {
   @Prop({ default: [] }) readonly data!: CRZMedia[];
   @Prop({ default: '' }) readonly folderName!: string;
+  @Prop({ required: true }) readonly isAudioReel!: boolean;
+  @Prop({ required: true }) readonly isVideoReel!: boolean;
   @Prop({ required: true }) readonly sort!: SortOptions;
 
   private autoCycle = false;
