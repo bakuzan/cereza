@@ -2,8 +2,9 @@ import { Repository } from 'sequelize-typescript';
 import Pinned from '../apollo-server/db/Pinned.model';
 
 import { CRZImage } from './CRZImage';
-import { CRZVideo } from './CRZVideo';
+import { CRZMedia } from './CRZMedia';
 import { DirectoryEntry } from './DirectoryEntry';
+import { SortOptions } from './SortOptions';
 
 export interface CRZContext {
   canGallery(entries: DirectoryEntry[]): Promise<boolean>;
@@ -19,9 +20,10 @@ export interface CRZContext {
     start: number,
     end: number
   ): Promise<Array<CRZImage>>;
-  readVideos(
+  readReel(
     entries: DirectoryEntry[],
-    folderName: string
-  ): Promise<Array<CRZVideo>>;
+    folderName: string,
+    sorting: SortOptions
+  ): Promise<Array<CRZMedia>>;
   Pinned: Repository<Pinned>;
 }

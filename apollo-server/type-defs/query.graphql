@@ -9,13 +9,17 @@ type Query {
   disks: [Disk]!
 
   "Fetch directory contents"
-  directory(path: String!, isRecursive: Boolean): DirectoryResponse
+  directory(
+    path: String!
+    isRecursive: Boolean
+    sort: SortOptions
+  ): DirectoryResponse
 
   "Fetch gallery directory contents"
   gallery(path: String!, page: Int!, size: Int!): GalleryResponse
 
   "Fetch reel directory contents"
-  reel(path: String!, isRecursive: Boolean): ReelResponse
+  reel(path: String!, isRecursive: Boolean, sort: SortOptions): ReelResponse
 
   "Activate path with default action"
   action(path: String!): ConfirmationResponse

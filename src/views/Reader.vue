@@ -30,7 +30,7 @@
               <table class="shortcuts-table">
                 <thead>
                   <tr>
-                    <th style="text-align:left;">Control</th>
+                    <th style="text-align: left">Control</th>
                     <th>Shortcut</th>
                   </tr>
                 </thead>
@@ -41,7 +41,7 @@
                     class="shortcuts-table__row"
                   >
                     <td>{{ item.name }}</td>
-                    <td style="text-align:center;">{{ item.shortcut }}</td>
+                    <td style="text-align: center">{{ item.shortcut }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -93,6 +93,7 @@ import { store } from '@/utils/localStorage';
 import scrollToAnchor from '@/utils/scrollToAnchor';
 import initReaderControls from '@/utils/userControls/reader';
 import calculateGalleryPage from '@/utils/calculateGalleryPage';
+import { getLocation } from '@/utils/routeArgs';
 import { ReaderMode } from '@/constants';
 
 @Component({
@@ -142,8 +143,7 @@ export default class Reader extends Vue {
 
   // Computed
   get directoryLocation() {
-    const loc = this.$route.query['loc'];
-    return (loc instanceof Array ? loc.pop() : loc) ?? '';
+    return getLocation(this.$route);
   }
 
   get mode() {

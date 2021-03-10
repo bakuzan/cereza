@@ -33,6 +33,8 @@
         <FileIcon v-else title="File" aria-label="File" />
 
         <div class="directory-item__name">{{ item.name }}</div>
+        <div style="display: flex; flex: 1"></div>
+        <div class="directory-item__date">{{ item.date }}</div>
       </Button>
     </div>
     <div v-if="isExpanded" class="directory-item__children">

@@ -2,7 +2,7 @@
   <div id="reel" class="page reel">
     <ApolloQuery
       :query="require('../graphql/Reel.gql')"
-      :variables="{ path: directoryLocation, isRecursive }"
+      :variables="{ path: directoryLocation, isRecursive, sort }"
     >
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
@@ -60,7 +60,9 @@
           <div v-if="data.reel.canReel" class="reel-pane">
             <ReelViewer
               :folder-name="data.reel.folderName"
-              :data="data.reel.videos"
+              :data="data.reel.media"
+              :sort="sort"
+              @updateSort="onSort"
             />
           </div>
           <div v-else>
@@ -80,6 +82,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
+import { SortOptions } from '@i/SortOptions';
+
 import Button from '@/components/Button.vue';
 import CrossIcon from '@/components/Icons/CrossIcon.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
@@ -87,6 +91,8 @@ import LoadingBouncer from '@/components/LoadingBouncer.vue';
 import ReelViewer from '@/components/ReelViewer.vue';
 import Help from '@/components/Help.vue';
 import Tickbox from '@/components/Tickbox.vue';
+
+import { getLocation, getRecursive, getSort } from '@/utils/routeArgs';
 
 @Component({
   components: {
@@ -106,6 +112,7 @@ import Tickbox from '@/components/Tickbox.vue';
 })
 export default class Reel extends Vue {
   private isRecursive = false;
+  private sort = { field: 'Name', order: 'ASC' };
   private reelShortcuts = [
     { name: 'Previous video', shortcut: 'p' },
     { name: 'Next video', shortcut: 'n' },
@@ -131,25 +138,31 @@ export default class Reel extends Vue {
   ];
 
   beforeMount() {
-    const rec = this.$route.query['recursive'];
-    const value = (rec instanceof Array ? rec.pop() : rec) ?? false;
-    this.isRecursive = value === 'true';
+    this.isRecursive = getRecursive(this.$route);
+    this.sort = getSort(this.$route);
   }
 
   // Computed
   get directoryLocation() {
-    const loc = this.$route.query['loc'];
-    return (loc instanceof Array ? loc.pop() : loc) ?? '';
+    return getLocation(this.$route);
   }
 
   // Methods
+  private onSort(option: SortOptions) {
+    this.$set(this, 'sort', option);
+  }
+
   private onIsRecursive() {
     this.isRecursive = !this.isRecursive;
   }
 
   private onCloseReel() {
     const param = window.encodeURIComponent(this.directoryLocation);
-    this.$router.push(`/directory?loc=${param}&recursive=${this.isRecursive}`);
+    const sorted = [this.sort.field, this.sort.order].join('__');
+
+    this.$router.push(
+      `/directory?loc=${param}&recursive=${this.isRecursive}&sort=${sorted}`
+    );
   }
 }
 </script>
@@ -199,7 +212,8 @@ export default class Reel extends Vue {
 </style>
 
 <style lang="scss">
-.recursive-check-box {
+.recursive-check-box,
+.order-check-box {
   --tickbox-default-colour: var(--accent-colour);
   margin: auto 0;
 }

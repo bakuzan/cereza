@@ -11,7 +11,7 @@
     </div>
     <ApolloQuery
       :query="require('../graphql/Directory.gql')"
-      :variables="{ path: directoryLocation, isRecursive }"
+      :variables="{ path: directoryLocation, isRecursive, sort }"
     >
       <template slot-scope="{ result: { loading, error, data } }">
         <LoadingBouncer v-if="loading" />
@@ -59,62 +59,7 @@
                 <FilmIcon :contrast="true" />Reel Mode
               </Button>
             </div>
-            <ApolloMutation
-              :mutation="require('../graphql/mutations/TogglePinned.gql')"
-              :variables="{ path: directoryLocation }"
-              @done="() => null"
-            >
-              <template
-                v-slot="{ mutate, loading: mutateLoading, error: mutateError }"
-              >
-                <ApolloQuery
-                  :query="require('../graphql/IsDirectoryPinned.gql')"
-                  :variables="{ path: directoryLocation }"
-                >
-                  <template slot-scope="{ result: pinRes }">
-                    <Button
-                      v-if="pinRes && pinRes.data"
-                      :class="{
-                        'pin-button': true,
-                        'pin-button--pinned': pinRes.data.isDirectoryPinned,
-                        'pin-button--unpinned': !pinRes.data.isDirectoryPinned
-                      }"
-                      :primary="true"
-                      :disabled="pinRes.loading || mutateLoading"
-                      @click="
-                        mutate({
-                          update: onUpdate,
-                          refetchQueries: [
-                            {
-                              query: require('../graphql/IsDirectoryPinned.gql'),
-                              variables: { path: directoryLocation }
-                            }
-                          ]
-                        })
-                      "
-                    >
-                      <PinIcon
-                        v-if="!pinRes.loading && !mutateLoading"
-                        :fill="true"
-                        :contrast="!pinRes.data.isDirectoryPinned"
-                      />
-                      {{
-                        pinRes.loading || mutateLoading
-                          ? ''
-                          : pinRes.data.isDirectoryPinned
-                          ? 'Unpin'
-                          : 'Pin'
-                      }}
-                    </Button>
-                    <p v-if="mutateError">
-                      Failed directory
-                      {{ data.isDirectoryPinned ? ' unpinning' : ' pinning' }}:
-                      {{ mutateError }}
-                    </p>
-                  </template>
-                </ApolloQuery>
-              </template>
-            </ApolloMutation>
+            <PinnedToggle :directoryLocation="directoryLocation" />
           </div>
           <div class="result__count">
             Showing
@@ -127,6 +72,7 @@
             {{ data.directory.entries.length
             }}{{ getLevelsMessage(data.directory.entries) }}
           </div>
+          <SortOptionsBlock :selected="sort" @change="onSortChange" />
           <ul class="grid directory-list">
             <DirectoryListItem
               v-for="tree of asTree(data.directory.entries)"
@@ -151,21 +97,24 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import { DirectoryEntry } from '@i/DirectoryEntry';
 import { ApolloResponse } from '@i/ApolloResponse';
 import { ConfirmationResponse } from '@i/ConfirmationResponse';
+import { SortOptions } from '@i/SortOptions';
 
-import { CRZDataProxy } from '@/types/CRZDataProxy';
 import Button from '@/components/Button.vue';
 import ErrorBlock from '@/components/ErrorBlock.vue';
 import LoadingBouncer from '@/components/LoadingBouncer.vue';
 import Widget from '@/components/Widget.vue';
 import FolderIcon from '@/components/Icons/FolderIcon.vue';
-import PinIcon from '@/components/Icons/PinIcon.vue';
 import BookIcon from '@/components/Icons/BookIcon.vue';
 import FilmIcon from '@/components/Icons/FilmIcon.vue';
+import PinnedToggle from '@/components/PinnedToggle.vue';
+import SortOptionsBlock from '@/components/SortOptions.vue';
 
 import Crumbs from '@/components/Crumbs.vue';
 import InputBox from '@/components/InputBox.vue';
 import Tickbox from '@/components/Tickbox.vue';
 import DirectoryListItem from '@/components/DirectoryListItem.vue';
+
+import { getLocation, getRecursive, getSort } from '@/utils/routeArgs';
 
 interface DirectoryTree {
   item: DirectoryEntry;
@@ -179,13 +128,14 @@ interface DirectoryTree {
     LoadingBouncer,
     Widget,
     FolderIcon,
-    PinIcon,
     BookIcon,
     FilmIcon,
     Crumbs,
     InputBox,
     Tickbox,
-    DirectoryListItem
+    DirectoryListItem,
+    PinnedToggle,
+    SortOptionsBlock
   },
   metaInfo() {
     return {
@@ -196,11 +146,11 @@ interface DirectoryTree {
 export default class Directory extends Vue {
   private filter = '';
   private isRecursive = false;
+  private sort = { field: 'Name', order: 'ASC' };
 
   beforeMount() {
-    const rec = this.$route.query['recursive'];
-    const value = (rec instanceof Array ? rec.pop() : rec) ?? false;
-    this.isRecursive = value === 'true';
+    this.isRecursive = getRecursive(this.$route);
+    this.sort = getSort(this.$route);
   }
 
   @Watch('$route')
@@ -210,8 +160,7 @@ export default class Directory extends Vue {
 
   // Computed
   get directoryLocation() {
-    const loc = this.$route.query['loc'];
-    return (loc instanceof Array ? loc.pop() : loc) ?? '';
+    return getLocation(this.$route);
   }
 
   get hasFilter() {
@@ -272,7 +221,11 @@ export default class Directory extends Vue {
 
   private navigateTo(directory: string) {
     const param = window.encodeURIComponent(directory);
-    this.$router.push(`/directory?loc=${param}`);
+    const sorted = [this.sort.field, this.sort.order].join('__');
+
+    this.$router.push(
+      `/directory?loc=${param}&recursive=${this.isRecursive}&sort=${sorted}`
+    );
   }
 
   private onFilter({ value }: { value: string }) {
@@ -283,8 +236,8 @@ export default class Directory extends Vue {
     this.isRecursive = !this.isRecursive;
   }
 
-  private onUpdate(client: CRZDataProxy) {
-    client.deleteQueryCRZ('allPinned');
+  private onSortChange(option: SortOptions) {
+    this.$set(this, 'sort', option);
   }
 
   private onReader() {
@@ -294,8 +247,10 @@ export default class Directory extends Vue {
 
   private onReel() {
     const param = window.encodeURIComponent(this.directoryLocation);
+    const sorted = [this.sort.field, this.sort.order].join('__');
+
     this.$router.push(
-      `/reel-viewer?loc=${param}&recursive=${this.isRecursive}`
+      `/reel-viewer?loc=${param}&recursive=${this.isRecursive}&sort=${sorted}`
     );
   }
 }
@@ -336,22 +291,10 @@ export default class Directory extends Vue {
   gap: 5px;
 }
 
-.pin-button,
 .can-do-button {
   justify-content: space-evenly;
   min-height: 2.5rem;
   min-width: 100px;
-}
-
-.pin-button--pinned {
-  background-color: var(--disabled-colour);
-  color: inherit;
-
-  &:focus,
-  &:hover,
-  &:active {
-    background-color: var(--disabled-colour);
-  }
 }
 
 .result {

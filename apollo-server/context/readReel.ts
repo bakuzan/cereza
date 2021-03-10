@@ -1,20 +1,22 @@
 import path from 'path';
-import { CRZVideo } from '@i/CRZVideo';
+import { CRZMedia } from '@i/CRZMedia';
 import { DirectoryEntry } from '@i/DirectoryEntry';
 
 import { getPathExtension, filterToFiles, distinct } from '../utils';
 import { obfuscate } from '../utils/obfuscate';
+import { SortOptions } from '@i/SortOptions';
 
 const base = process.env.VUE_APP_GRAPHQL_HTTP || '';
 const getVideoUrl = (key: string) =>
-  `${base.replace('/graphql', '')}/video?key=${key}`;
+  `${base.replace('/graphql', '')}/stream?key=${key}`;
 
-export default async function readVideos(
+export default async function readReel(
   entries: DirectoryEntry[],
-  folderName: string
-): Promise<CRZVideo[]> {
+  folderName: string,
+  sorting: SortOptions
+): Promise<CRZMedia[]> {
   const items = entries.filter(filterToFiles);
-  const videos: CRZVideo[] = [];
+  const media: CRZMedia[] = [];
 
   for (const entry of items) {
     const filePath = entry.targetPath ?? entry.path;
@@ -22,6 +24,7 @@ export default async function readVideos(
     const key = obfuscate(filePath);
     const url = getVideoUrl(key);
 
+    const date = entry.date;
     const fullName = entry.name;
     const folderName = path.basename(path.dirname(entry.path));
     const name = fullName
@@ -29,9 +32,10 @@ export default async function readVideos(
       .slice(0, -1)
       .join('.');
 
-    videos.push({
+    media.push({
       key,
       name,
+      date,
       folderName,
       fullName,
       extension,
@@ -39,15 +43,22 @@ export default async function readVideos(
     });
   }
 
-  return videos.filter(distinct((x) => x.url)).sort((a, b) => {
+  const isTitle = sorting.field === 'Name';
+  const isDesc = sorting.order === 'DESC';
+  return media.filter(distinct((x) => x.url)).sort((a, b) => {
+    if (!isTitle) {
+      return isDesc ? (b.date < a.date ? -1 : 1) : b.date < a.date ? 1 : -1;
+    }
+
     const isATop = a.folderName === folderName;
     const isBTop = b.folderName === folderName;
 
-    return isATop && !isBTop
-      ? -1
-      : !isATop && isBTop
-      ? 1
+    if (isATop && !isBTop) return -1;
+    if (!isATop && isBTop) return 1;
+
+    return isDesc
+      ? b.folderName.localeCompare(a.folderName) || b.name.localeCompare(a.name)
       : a.folderName.localeCompare(b.folderName) ||
-        a.name.localeCompare(b.name);
+          a.name.localeCompare(b.name);
   });
 }

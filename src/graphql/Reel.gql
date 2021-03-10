@@ -1,8 +1,8 @@
-query Reel($path: String!, $isRecursive: Boolean) {
-  reel(path: $path, isRecursive: $isRecursive) {
+query Reel($path: String!, $isRecursive: Boolean, $sort: SortOptions) {
+  reel(path: $path, isRecursive: $isRecursive, sort: $sort) {
     canReel
     folderName
-    videos {
+    media {
       extension
       fullName
       folderName

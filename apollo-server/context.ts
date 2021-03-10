@@ -6,7 +6,7 @@ import isFile from './context/isFile';
 import pathExists from './context/pathExists';
 import readDirectory from './context/readDirectory';
 import readImages from './context/readImages';
-import readVideos from './context/readVideos';
+import readReel from './context/readReel';
 import { Pinned } from './context/dbContext';
 
 export default (): CRZContext => ({
@@ -16,6 +16,6 @@ export default (): CRZContext => ({
   pathExists,
   readDirectory,
   readImages,
-  readVideos,
+  readReel,
   Pinned
 });

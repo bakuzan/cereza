@@ -11,10 +11,12 @@ import {
   isDirectory,
   isAudio
 } from './checkFileType';
+import { filterExcludedExtensions } from '@s/utils';
 import getShortcutTargetPath from '@s/utils/getShortcutTargetPath';
 import { maximumRecursionLevel } from '@s/constants';
 
 const readdir = promisify(fs.readdir);
+const stat = promisify(fs.stat);
 
 async function getDirectoryItems(location: string) {
   return await readdir(location, {
@@ -23,18 +25,20 @@ async function getDirectoryItems(location: string) {
   });
 }
 
-function processDirectory(
+async function processDirectory(
   systemPath: string,
   item: fs.Dirent,
   level = 0
-): DirectoryEntry {
+): Promise<DirectoryEntry> {
   const fullName = path.join(systemPath, item.name);
   const parentName = path.basename(path.dirname(fullName));
   const isDirectory = item.isDirectory();
+  const meta = await stat(fullName);
 
   return {
     name: item.name,
     path: fullName,
+    date: meta.mtime,
     level,
     targetPath: null,
     parentName,
@@ -91,9 +95,12 @@ export default async function readDirectory(
   }
 
   const items = await getDirectoryItems(systemPath);
-  const entries = await processShortcuts(
-    items.map((x) => processDirectory(systemPath, x))
-  );
+  const pendingItems = items
+    .filter(filterExcludedExtensions)
+    .map((x) => processDirectory(systemPath, x));
+
+  const processedItems = await Promise.all(pendingItems);
+  const entries = await processShortcuts(processedItems);
 
   if (isRecursive) {
     for (const entry of entries) {
@@ -106,9 +113,12 @@ export default async function readDirectory(
         }
 
         const childItems = await getDirectoryItems(parentPath);
-        const children = await processShortcuts(
-          childItems.map((x) => processDirectory(parentPath, x, level))
-        );
+        const pendingChildren = childItems
+          .filter(filterExcludedExtensions)
+          .map((x) => processDirectory(parentPath, x, level));
+
+        const processedChildren = await Promise.all(pendingChildren);
+        const children = await processShortcuts(processedChildren);
 
         entries.push(...children);
       }

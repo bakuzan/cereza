@@ -24,6 +24,15 @@
         <div class="video__playback-speed">
           ({{ meta.playbackSpeed }}x speed)
         </div>
+        <Button
+          v-if="activeVideo"
+          class="action-button"
+          aria-label="Open parent folder"
+          title="Open parent folder"
+          @click="openParentFolder(activeVideo)"
+        >
+          <FolderIcon />
+        </Button>
       </h3>
       <div class="video__controls controls">
         <div>
@@ -80,6 +89,7 @@
         @change="onFilter"
         @keypress.stop="() => null"
       />
+      <SortOptionsBlock :selected="sort" @change="onSortChange" />
       <ul class="reel-viewer__directory">
         <li
           v-for="folder of directory"
@@ -127,9 +137,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Emit } from 'vue-property-decorator';
 
-import { CRZVideo } from '@i/CRZVideo';
+import { CRZMedia } from '@i/CRZMedia';
+import { SortOptions } from '@i/SortOptions';
+import { ApolloResponse } from '@i/ApolloResponse';
+import { ConfirmationResponse } from '@i/ConfirmationResponse';
+
+import FolderIcon from '@/components/Icons/FolderIcon.vue';
 import Button from '@/components/Button.vue';
 import InputBox from '@/components/InputBox.vue';
 import Tickbox from '@/components/Tickbox.vue';
@@ -137,7 +152,10 @@ import PlayIcon from '@/components/Icons/PlayIcon.vue';
 import ArrowLeft from '@/components/Icons/ArrowLeft.vue';
 import ArrowRight from '@/components/Icons/ArrowRight.vue';
 import RandomIcon from '@/components/Icons/RandomIcon.vue';
+import SortOptionsBlock from '@/components/SortOptions.vue';
+
 import { getRandomInt } from '@/utils/random';
+import { getLocation } from '@/utils/routeArgs';
 import initReelControls from '@/utils/userControls/reel';
 
 const DURATION_CAP_SECONDS = 6;
@@ -155,12 +173,15 @@ const defaultMeta = {
     ArrowRight,
     RandomIcon,
     Tickbox,
-    InputBox
+    InputBox,
+    SortOptionsBlock,
+    FolderIcon
   }
 })
 export default class ReelViewer extends Vue {
-  @Prop({ default: [] }) readonly data!: CRZVideo[];
+  @Prop({ default: [] }) readonly data!: CRZMedia[];
   @Prop({ default: '' }) readonly folderName!: string;
+  @Prop({ required: true }) readonly sort!: SortOptions;
 
   private autoCycle = false;
   private randomCycle = false;
@@ -202,13 +223,21 @@ export default class ReelViewer extends Vue {
     return this.data.filter((x) => x.name.toLowerCase().includes(this.filter));
   }
 
+  get isNameSorted() {
+    return this.sort.field === 'Name';
+  }
+
   get directory() {
-    return Array.from(new Set(this.filteredData.map((x) => x.folderName)))
-      .map((folderName) => ({
-        folderName,
-        items: this.filteredData.filter((x) => x.folderName === folderName)
-      }))
-      .filter((x) => x.items.length);
+    if (this.isNameSorted) {
+      return Array.from(new Set(this.filteredData.map((x) => x.folderName)))
+        .map((folderName) => ({
+          folderName,
+          items: this.filteredData.filter((x) => x.folderName === folderName)
+        }))
+        .filter((x) => x.items.length);
+    } else {
+      return [{ folderName: this.folderName, items: this.filteredData }];
+    }
   }
 
   get activeIndex() {
@@ -230,7 +259,12 @@ export default class ReelViewer extends Vue {
     this.$set(this, 'filter', value.toLowerCase());
   }
 
-  private isActive(item: CRZVideo) {
+  @Emit('updateSort')
+  private onSortChange(option: SortOptions) {
+    return option;
+  }
+
+  private isActive(item: CRZMedia) {
     return this.activeVideo && this.activeVideo.key === item.key;
   }
 
@@ -262,7 +296,7 @@ export default class ReelViewer extends Vue {
     this.randomCycle = this.autoCycle && !this.randomCycle;
   }
 
-  private onVideoSelect(item: CRZVideo) {
+  private onVideoSelect(item: CRZMedia) {
     this.$router.replace({
       name: 'Reel',
       query: {
@@ -312,6 +346,27 @@ export default class ReelViewer extends Vue {
       this.onChangeVideo(1);
     }
   }
+
+  private async openParentFolder(file: CRZMedia) {
+    const baseLocation = getLocation(this.$route);
+    const path =
+      this.folderName === file.folderName
+        ? baseLocation
+        : `${baseLocation}\\${file.folderName}`.replace(/\\\\/g, '\\');
+
+    const result = await this.$apollo.query<
+      ApolloResponse<ConfirmationResponse>
+    >({
+      fetchPolicy: 'network-only',
+      query: require('../graphql/Action.gql'),
+      variables: { path }
+    });
+
+    if (!result.data?.action.success) {
+      // TODO Handle error
+      console.error(`Failed action @ ${path}`, result);
+    }
+  }
 }
 </script>
 
@@ -319,6 +374,7 @@ export default class ReelViewer extends Vue {
 @import '../styles/_mixins';
 
 $filter-box-height: 46px;
+$sort-options-height: 45px;
 
 $max-height: 500px;
 $max-width: 100%;
@@ -346,7 +402,7 @@ $max-width: 100%;
   &__directory {
     list-style-type: none;
     max-height: calc(
-      100vh - (var(--header-height) * 2) - #{$filter-box-height}
+      100vh - (var(--header-height) * 2) - #{$filter-box-height} - #{$sort-options-height}
     );
     padding: 0;
     margin: 0;

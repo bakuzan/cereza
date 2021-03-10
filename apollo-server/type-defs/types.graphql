@@ -1,3 +1,23 @@
+# Enum
+enum SortField {
+  Name
+  Time
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+# Inputs
+
+input SortOptions {
+  field: SortField
+  order: SortOrder
+}
+
+# Types
+
 type Disk {
   name: String
   path: String
@@ -5,6 +25,7 @@ type Disk {
 
 type DirectoryEntry {
   name: String
+  date: String
   path: String
   level: Int
   targetPath: String
@@ -36,7 +57,7 @@ type GalleryResponse {
   images: [CRZImage]!
 }
 
-type CRZVideo {
+type CRZMedia {
   folderName: String
   fullName: String
   name: String
@@ -48,7 +69,7 @@ type CRZVideo {
 type ReelResponse {
   canReel: Boolean
   folderName: String
-  videos: [CRZVideo]!
+  media: [CRZMedia]!
 }
 
 # Db models
