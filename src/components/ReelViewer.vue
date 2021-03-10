@@ -19,13 +19,13 @@
           :type="`video/${activeVideo.extension}`"
         ></video>
         <audio
-          v-if="activeVideo === null && isAudioReel"
+          v-if="activeVideo === null && isAudioReel && !isVideoReel"
           id="videoPlayer"
           class="reel-viewer-active-video"
           controls
         ></audio>
         <audio
-          v-else-if="activeVideo && isAudioReel"
+          v-else-if="activeVideo && isAudioReel && !isVideoReel"
           id="videoPlayer"
           class="reel-viewer-active-video"
           controls
