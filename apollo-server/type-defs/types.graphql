@@ -59,6 +59,7 @@ type GalleryResponse {
 
 type CRZMedia {
   folderName: String
+  folderPath: String
   fullName: String
   name: String
   extension: String

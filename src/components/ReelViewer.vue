@@ -366,11 +366,7 @@ export default class ReelViewer extends Vue {
   }
 
   private async openParentFolder(file: CRZMedia) {
-    const baseLocation = getLocation(this.$route);
-    const path =
-      this.folderName === file.folderName
-        ? baseLocation
-        : `${baseLocation}\\${file.folderName}`.replace(/\\\\/g, '\\');
+    const path = file.folderPath; // `${baseLocation}\\${file.folderName}`.replace(/\\\\/g, '\\');
 
     const result = await this.$apollo.query<
       ApolloResponse<ConfirmationResponse>

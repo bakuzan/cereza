@@ -316,16 +316,3 @@ export default class Directory extends Vue {
   min-width: 250px;
 }
 </style>
-
-<style lang="scss">
-.action-button {
-  &:focus,
-  &:hover,
-  &:active {
-    svg {
-      stroke: var(--accent-contrast);
-      fill: var(--accent-colour);
-    }
-  }
-}
-</style>

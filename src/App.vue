@@ -218,6 +218,17 @@ input {
   padding: 0;
   list-style-type: none;
 }
+
+.action-button {
+  &:focus,
+  &:hover,
+  &:active {
+    svg {
+      stroke: var(--accent-contrast);
+      fill: var(--accent-colour);
+    }
+  }
+}
 </style>
 
 <style lang="scss" scoped>

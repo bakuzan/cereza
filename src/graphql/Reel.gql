@@ -8,6 +8,7 @@ query Reel($path: String!, $isRecursive: Boolean, $sort: SortOptions) {
       extension
       fullName
       folderName
+      folderPath
       key
       name
       url

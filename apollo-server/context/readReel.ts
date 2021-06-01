@@ -26,7 +26,8 @@ export default async function readReel(
 
     const date = entry.date;
     const fullName = entry.name;
-    const folderName = path.basename(path.dirname(entry.path));
+    const folderPath = path.dirname(entry.path);
+    const folderName = path.basename(folderPath);
     const name = fullName
       .split('.')
       .slice(0, -1)
@@ -37,6 +38,7 @@ export default async function readReel(
       name,
       date,
       folderName,
+      folderPath,
       fullName,
       extension,
       url
