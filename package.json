@@ -59,7 +59,7 @@
     "eslint-plugin-vue": "^6.2.2",
     "graphql-tag": "^2.11.0",
     "lint-staged": "^10.2.11",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "prettier": "^1.19.1",
     "sass-loader": "^9.0.2",
     "tsconfig-paths": "^3.9.0",
